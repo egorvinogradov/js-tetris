@@ -1,26 +1,11 @@
 import { random } from './utils.js';
-
-export const FIGURE_TYPES = {
-  TYPE_I: [
-    [1],
-    [1],
-    [1],
-    [1],
-  ],
-  TYPE_T: [
-    [1,1,1],
-    [0,1,0],
-  ],
-  TYPE_Z: [
-    [1,1,0],
-    [0,1,1],
-  ],
-};
+import { FIGURE_TYPES } from './figure_types.js';
 
 export class Figure {
   x = 0;
   y = 0;
   type = null;
+  typeIndex = 0;
   data = [];
 
   /**
@@ -43,11 +28,21 @@ export class Figure {
   spawn = () => {
     const figureTypes = Object.keys(FIGURE_TYPES);
     this.type = figureTypes[random(figureTypes.length - 1)];
-    this.data = FIGURE_TYPES[this.type];
+    this.typeIndex = random(FIGURE_TYPES[this.type].length - 1);
+    this.data = FIGURE_TYPES[this.type][this.typeIndex];
 
     const maxPosX = this.matrix.width - this.width;
     this.x = random(maxPosX);
     this.y = 0;
+  };
+
+  rotate = () => {
+    let nextTypeIndex = this.typeIndex + 1;
+    if (nextTypeIndex >= FIGURE_TYPES[this.type].length) {
+      nextTypeIndex = 0;
+    }
+    this.data = FIGURE_TYPES[this.type][nextTypeIndex];
+    this.typeIndex = nextTypeIndex;
   };
 
   moveDown = () => {

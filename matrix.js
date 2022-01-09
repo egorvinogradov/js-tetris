@@ -10,8 +10,7 @@ export class Matrix {
     this.width = width;
     this.height = height;
     this.container = container;
-    this.canvas = this.createClearCanvas();
-    this.render();
+    this.clear();
   };
 
   createClearCanvas = () => {
@@ -63,5 +62,10 @@ export class Matrix {
     }).join('');
 
     this.container.innerHTML= `<table>${tableHtml}</table>`;
+  };
+
+  clear = () => {
+    this.canvas = this.createClearCanvas();
+    this.render();
   };
 }

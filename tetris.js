@@ -1,5 +1,5 @@
 import { Matrix } from './matrix.js';
-import { Figure } from './figures.js';
+import { Figure } from './figure.js';
 import { arrayLast } from './utils.js';
 
 export class Tetris {
@@ -23,29 +23,44 @@ export class Tetris {
     this.matrix = new Matrix(config.width, config.height, this.container);
 
     window.addEventListener('keydown', e => {
-      const acceptedKeys = ['ArrowLeft', 'ArrowRight'];
-      if (acceptedKeys.includes(e.key)) {
+      const acceptedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowDown', 'KeyR'];
+      if (acceptedKeys.includes(e.code)) {
         this.onKeyPress(e);
       }
     });
   }
 
   onKeyPress = (e) => {
-    if (e.key === 'ArrowLeft') {
-      this.currentFigure.moveLeft();
+    const actions = {
+      'ArrowLeft': () => this.currentFigure.moveLeft(),
+      'ArrowRight': () => this.currentFigure.moveRight(),
+      'ArrowDown': () => this.fastDescent(),
+      'KeyR': () => this.rotateCurrentFigure(),
+    };
+    const action = actions[e.code];
+    if (action) {
+      action();
+      this.matrix.render(this.currentFigure);
+      e.preventDefault();
     }
-    else if (e.key === 'ArrowRight') {
-      this.currentFigure.moveRight();
-    }
-    this.matrix.render(this.currentFigure);
-    e.preventDefault();
+  };
+
+  launchGame = () => {
+    this.matrix.clear();
+    this.runIteration();
   };
 
   runIteration = () => {
+    this.clearFilledLines();
+
     this.currentFigure = new Figure(this.matrix);
     this.currentFigure.spawn();
-    this.matrix.render(this.currentFigure);
 
+    if ( this.isGameFailed(this.currentFigure) ) {
+      return this.onGameOver();
+    }
+
+    this.matrix.render(this.currentFigure);
     this.descend(() => {
       console.log('Figure has been stacked', this.currentFigure);
       this.matrix.stackFigureOntoCanvas(this.currentFigure);
@@ -66,6 +81,29 @@ export class Tetris {
         callback();
       }
     }, this.iterationDuration);
+  };
+
+  rotateCurrentFigure = () => {
+    this.currentFigure.rotate();
+    this.matrix.render(this.currentFigure);
+  };
+
+  fastDescent = () => {
+    // TODO: fix
+  };
+
+  isGameFailed = () => {
+    // TODO: fix
+    return false;
+  };
+
+  onGameOver = () => {
+    // TODO: fix
+    alert('Game over');
+  };
+
+  clearFilledLines = () => {
+    // TODO: fix
   };
 
   calculateShortestDistanceBelow = () => {
@@ -97,6 +135,6 @@ export class Tetris {
 window.tetris = new Tetris({
   width: 10,
   height: 10,
-  speed: 90,
+  speed: 100,
 });
-tetris.runIteration();
+tetris.launchGame();
