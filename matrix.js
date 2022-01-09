@@ -10,7 +10,7 @@ export class Matrix {
     this.width = width;
     this.height = height;
     this.container = container;
-    this.clear();
+    this.reset();
   };
 
   createClearCanvas = () => {
@@ -64,8 +64,39 @@ export class Matrix {
     this.container.innerHTML= `<table>${tableHtml}</table>`;
   };
 
-  clear = () => {
+  reset = () => {
     this.canvas = this.createClearCanvas();
     this.render();
+  };
+
+  clearFilledRows = () => {
+    let newRowsCounter = 0;
+    let clearedCanvas = [];
+
+    this.canvas.forEach(row => {
+      if (this.isRowFilled(row)) {
+        newRowsCounter++;
+      }
+      else {
+        clearedCanvas.push(row);
+      }
+    });
+
+    const emptyRow = createArray(this.width, 0);
+    this.canvas = [
+      ...createArray(newRowsCounter, emptyRow),
+      ...clearedCanvas,
+    ];
+    this.render();
+  };
+
+  isRowFilled = (row) => {
+    for (let i = 0; i < row.length; i++) {
+      const point = row[i];
+      if (!point) {
+        return false;
+      }
+    }
+    return true;
   };
 }

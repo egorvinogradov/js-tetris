@@ -46,12 +46,12 @@ export class Tetris {
   };
 
   launchGame = () => {
-    this.matrix.clear();
+    this.matrix.reset();
     this.runIteration();
   };
 
   runIteration = () => {
-    this.clearFilledLines();
+    this.matrix.clearFilledRows();
 
     this.currentFigure = new Figure(this.matrix);
     this.currentFigure.spawn();
