@@ -10,14 +10,18 @@ export class Matrix {
     this.width = width;
     this.height = height;
     this.container = container;
-
     this.canvas = this.createClearCanvas();
     this.render();
   };
 
   createClearCanvas = () => {
     const row = createArray(this.width, 0);
+
+    // TODO: uncomment
     return createArray(this.height, row);
+
+    // TODO: REMOVE TEST DATA
+    // return [ ...createArray(this.height - 1, row), [1,0,0,1,0,1,0,1,0,1], ];
   };
 
   /**
