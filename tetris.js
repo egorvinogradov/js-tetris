@@ -25,9 +25,10 @@ let CURRENT_FIGURE_TIMEOUT = 2 * 1000;
 
 function spawnRandomFigure(){
   const figureTypes = Object.keys(FIGURES);
-  const CURRENT_FIGURE_TYPE = figureTypes[random(figureTypes.length - 1)];
-  const CURRENT_FIGURE = FIGURES[CURRENT_FIGURE_TYPE];
+  CURRENT_FIGURE_TYPE = figureTypes[random(figureTypes.length - 1)];
+  CURRENT_FIGURE = FIGURES[CURRENT_FIGURE_TYPE];
 
+  console.log('__CURRENT_FIGURE', CURRENT_FIGURE);
   const xMaxPos = MATRIX_WIDTH - CURRENT_FIGURE[0].length;
 
   CURRENT_FIGURE_X = random(xMaxPos);
@@ -36,6 +37,22 @@ function spawnRandomFigure(){
 
 function drawFigureOnMartix(figure){
   console.log('drawFigureOnMartix', figure);
+
+  const affectedMatrixRows = MATRIX.slice(CURRENT_FIGURE_Y, figure.length + CURRENT_FIGURE_Y);
+  const updatedAffectedMatrixRows = affectedMatrixRows.map((row, i) => {
+    return [
+      ...row.slice(0, CURRENT_FIGURE_X),
+      ...figure[i],
+      ...row.slice(CURRENT_FIGURE_X + figure[0].length),
+    ];
+  });
+
+  MATRIX = [
+    ...MATRIX.slice(0, CURRENT_FIGURE_Y),
+    ...updatedAffectedMatrixRows,
+    ...MATRIX.slice(CURRENT_FIGURE_Y + figure.length),
+  ];
+  renderMatrix();
 };
 
 function random(limit){
@@ -97,7 +114,7 @@ function moveCurrentFigureByTimer(figure, callback){
       clearTimeout(window.figureTimeout);
       callback();
     }
-    
+
 
   }, CURRENT_FIGURE_TIMEOUT);
 }
@@ -106,12 +123,12 @@ function moveCurrentFigureByTimer(figure, callback){
 clearMartix();
 renderMatrix();
 spawnRandomFigure();
+drawFigureOnMartix(CURRENT_FIGURE);
 
 
-
-moveCurrentFigureByTimer(() => {
-  console.log('--- DONE ---');
-});
+// moveCurrentFigureByTimer(() => {
+//   console.log('--- DONE ---');
+// });
 
 
 
