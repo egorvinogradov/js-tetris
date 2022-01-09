@@ -1,12 +1,10 @@
 import { Matrix } from './matrix.js';
 import { Figure } from './figures.js';
-import { arrayLast, createArray } from './utils.js';
+import { arrayLast } from './utils.js';
 
 export class Tetris {
-  width = 10;
-  height = 10;
   container = null;
-  iterationDuration = 1.2 * 1000;
+  iterationDuration = null;
   currentIterationTimeout = null;
 
   /**
@@ -19,9 +17,10 @@ export class Tetris {
    */
   currentFigure = null;
 
-  constructor(){
+  constructor(config){
+    this.iterationDuration = (config.speed || 100) * 10;
     this.container = document.getElementById('matrix');
-    this.matrix = new Matrix(this.width, this.height, this.container);
+    this.matrix = new Matrix(config.width, config.height, this.container);
   }
 
   runIteration = () => {
@@ -40,7 +39,7 @@ export class Tetris {
       const distanceBelow = this.calculateShortestDistanceBelow();
       if (distanceBelow > 0) {
         console.warn('__ proceed', distanceBelow);
-        this.currentFigure.moveStepDown();
+        this.currentFigure.moveDown();
         this.matrix.render(this.currentFigure);
         this.crawlDownward(callback);
       }
@@ -67,10 +66,10 @@ export class Tetris {
     });
 
     const distancesBelow = figureLowestPoints.map(([pointX, pointY]) => {
-      for (let matrixRowNumber = pointX; matrixRowNumber < this.matrix.canvas.length; matrixRowNumber++) {
+      for (let matrixRowNumber = pointY; matrixRowNumber < this.matrix.canvas.length; matrixRowNumber++) {
         const pointInRow = this.matrix.canvas[matrixRowNumber];
         console.log('__ pointInRow', matrixRowNumber, pointInRow);
-        if (pointInRow) {
+        if (pointInRow[pointX]) {
           return matrixRowNumber - pointY;
         }
       }
@@ -86,5 +85,9 @@ export class Tetris {
 }
 
 
-window.tetris = new Tetris();
+window.tetris = new Tetris({
+  width: 10,
+  height: 10,
+  speed: 120,
+});
 tetris.runIteration();

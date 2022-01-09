@@ -42,7 +42,7 @@ export class Figure {
     this.y = 0;
   };
 
-  moveStepDown = () => {
+  moveDown = () => {
     this.y++;
   };
 }

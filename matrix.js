@@ -18,10 +18,10 @@ export class Matrix {
     const row = createArray(this.width, 0);
 
     // TODO: uncomment
-    return createArray(this.height, row);
+    // return createArray(this.height, row);
 
     // TODO: REMOVE TEST DATA
-    // return [ ...createArray(this.height - 1, row), [1,0,0,1,0,1,0,1,0,1], ];
+    return [ ...createArray(this.height - 1, row), [1,0,0,1,0,1,0,1,0,1], ];
   };
 
   /**
