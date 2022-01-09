@@ -21,40 +21,56 @@ export class Tetris {
     this.iterationDuration = (config.speed || 100) * 10;
     this.container = document.getElementById('matrix');
     this.matrix = new Matrix(config.width, config.height, this.container);
+
+    window.addEventListener('keydown', e => {
+      const acceptedKeys = ['ArrowLeft', 'ArrowRight'];
+      if (acceptedKeys.includes(e.key)) {
+        this.onKeyPress(e);
+      }
+    });
   }
+
+  onKeyPress = (e) => {
+    if (e.key === 'ArrowLeft') {
+      this.currentFigure.moveLeft();
+    }
+    else if (e.key === 'ArrowRight') {
+      this.currentFigure.moveRight();
+    }
+    this.matrix.render(this.currentFigure);
+    e.preventDefault();
+  };
 
   runIteration = () => {
     this.currentFigure = new Figure(this.matrix);
     this.currentFigure.spawn();
     this.matrix.render(this.currentFigure);
 
-    this.crawlDownward(() => {
+    this.descend(() => {
       console.log('Figure has been stacked', this.currentFigure);
-      this.matrix.stackFigureOntoCanvas();
+      this.matrix.stackFigureOntoCanvas(this.currentFigure);
+      this.runIteration();
     });
   };
 
-  crawlDownward = (callback) => {
+  descend = (callback) => {
     this.currentIterationTimeout = setTimeout(() => {
       const distanceBelow = this.calculateShortestDistanceBelow();
       if (distanceBelow > 0) {
-        console.warn('__ proceed', distanceBelow);
         this.currentFigure.moveDown();
         this.matrix.render(this.currentFigure);
-        this.crawlDownward(callback);
+        this.descend(callback);
       }
       else {
-        console.error('__ do not proceed', distanceBelow);
         clearTimeout(this.currentIterationTimeout);
         callback();
       }
-
     }, this.iterationDuration);
   };
 
   calculateShortestDistanceBelow = () => {
     const figureLowestRow = arrayLast(this.currentFigure.data);
-    const figureLowestRowY = this.currentFigure.data.length + this.currentFigure.y;
+    const figureLowestRowY = this.currentFigure.height + this.currentFigure.y;
     const figureLowestPoints = [];
     figureLowestRow.forEach((point, i) => {
       if (point) {
@@ -64,22 +80,15 @@ export class Tetris {
         ]);
       }
     });
-
     const distancesBelow = figureLowestPoints.map(([pointX, pointY]) => {
       for (let matrixRowNumber = pointY; matrixRowNumber < this.matrix.canvas.length; matrixRowNumber++) {
         const pointInRow = this.matrix.canvas[matrixRowNumber];
-        console.log('__ pointInRow', matrixRowNumber, pointInRow);
         if (pointInRow[pointX]) {
           return matrixRowNumber - pointY;
         }
       }
       return this.matrix.canvas.length - pointY;
     });
-
-    console.log('__ figureLowestPoints', figureLowestPoints);
-    console.log('__ figureLowestRowY', figureLowestRowY);
-    console.log('__ distancesBelow', distancesBelow);
-
     return distancesBelow.sort()[0];
   };
 }
@@ -88,6 +97,6 @@ export class Tetris {
 window.tetris = new Tetris({
   width: 10,
   height: 10,
-  speed: 120,
+  speed: 90,
 });
 tetris.runIteration();

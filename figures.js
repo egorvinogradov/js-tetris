@@ -8,8 +8,8 @@ export const FIGURE_TYPES = {
     [1],
   ],
   TYPE_T: [
-    [0,1,0],
     [1,1,1],
+    [0,1,0],
   ],
   TYPE_Z: [
     [1,1,0],
@@ -28,6 +28,14 @@ export class Figure {
    */
   matrix = null;
 
+  get width(){
+    return this.data[0].length;
+  };
+
+  get height(){
+    return this.data.length;
+  };
+
   constructor(matrix){
     this.matrix = matrix;
   }
@@ -37,12 +45,31 @@ export class Figure {
     this.type = figureTypes[random(figureTypes.length - 1)];
     this.data = FIGURE_TYPES[this.type];
 
-    const maxPosX = this.matrix.width - this.data[0].length;
+    const maxPosX = this.matrix.width - this.width;
     this.x = random(maxPosX);
     this.y = 0;
   };
 
   moveDown = () => {
     this.y++;
+  };
+
+  moveHorizontally = (delta) => {
+    let nextPosX = this.x + delta;
+    if (nextPosX < 0) {
+      nextPosX = 0;
+    }
+    if (nextPosX > this.matrix.width) {
+      nextPosX = this.matrix.width;
+    }
+    this.x = nextPosX;
+  };
+
+  moveLeft = () => {
+    this.moveHorizontally(-1);
+  };
+
+  moveRight = () => {
+    this.moveHorizontally(1);
   };
 }

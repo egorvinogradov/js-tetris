@@ -1,4 +1,4 @@
-import { createArray } from './utils.js';
+import { createArray, deepCloneArray } from './utils.js';
 
 export class Matrix {
   width = 0;
@@ -16,39 +16,33 @@ export class Matrix {
 
   createClearCanvas = () => {
     const row = createArray(this.width, 0);
-
-    // TODO: uncomment
-    // return createArray(this.height, row);
-
-    // TODO: REMOVE TEST DATA
-    return [ ...createArray(this.height - 1, row), [1,0,0,1,0,1,0,1,0,1], ];
+    return createArray(this.height, row);
   };
 
   /**
    * @param {Figure} figure
    */
   createCanvasWithFigure = (figure) => {
-    const affectedCanvasRows = this.canvas.slice(figure.y, figure.data.length + figure.y);
-    const updatedAffectedCanvasRows = affectedCanvasRows.map((row, i) => {
-      return [
-        ...row.slice(0, figure.x),
-        ...figure.data[i],
-        ...row.slice(figure.x + figure.data[0].length),
-      ];
+    const canvasWithFigure = deepCloneArray(this.canvas);
+
+    figure.data.forEach((row, figureY) => {
+      row.forEach((point, figureX) => {
+        if (point) {
+          const canvasX = figureX + figure.x;
+          const canvasY = figureY + figure.y;
+          canvasWithFigure[canvasY][canvasX] = point;
+        }
+      });
     });
-    return [
-      ...this.canvas.slice(0, figure.y),
-      ...updatedAffectedCanvasRows,
-      ...this.canvas.slice(figure.y + figure.data.length),
-    ];
+    return canvasWithFigure;
   };
 
   /**
    * @param {Figure} [figure]
    */
   stackFigureOntoCanvas = (figure) => {
-    // TODO: re-render
-    // TODO: destroy figure
+    this.canvas = this.createCanvasWithFigure(figure);
+    this.render();
   };
 
   /**
