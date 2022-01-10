@@ -266,8 +266,8 @@
         </filter>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Artboard" transform="translate(-182.000000, -84.000000)">
-            <g id="Tetris" transform="translate(182.000000, 84.000000)">
+        <g id="Artboard" transform="translate(-136.000000, -51.000000)">
+            <g id="Tetris" transform="translate(136.000000, 51.000000)">
                 <mask id="mask-2" fill="white">
                     <use xlink:href="#path-1"></use>
                 </mask>
@@ -294,7 +294,7 @@
                         <rect id="|2-copy-2" opacity="0.161819" filter="url(#filter-14)" x="2" y="313" width="3" height="252" rx="1.5"></rect>
                     </g>
                 </g>
-                <rect id="glow-bottom" fill="url(#linearGradient-15)" opacity="0.0981212798" filter="url(#filter-16)" mask="url(#mask-5)" x="20" y="335" width="213" height="247" rx="5"></rect>
+                <rect id="glow-bottom" fill="url(#linearGradient-15)" opacity="0.0981212798" filter="url(#filter-16)" mask="url(#mask-5)" x="21" y="335" width="213" height="247" rx="5"></rect>
                 <g id="screen-sides" mask="url(#mask-5)">
                     <g transform="translate(55.000000, 26.000000)">
                         <polygon id="l" fill="url(#linearGradient-17)" points="0 0 18 12 18 173 0 186"></polygon>
@@ -587,33 +587,29 @@
                     <tspan x="166" y="370.1">MUTE</tspan>
                 </text>
                 <text id="down" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="63" y="461">DOWN</tspan>
+                    <tspan x="64" y="461">DOWN</tspan>
                 </text>
                 <text id="rotate" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="197" y="441">ROTATE</tspan>
+                    <tspan x="197.1515" y="441">ROTATE</tspan>
                 </text>
                 <text id="Left" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="37" y="433.1">LEFT</tspan>
+                    <tspan x="37.7425" y="433">LEFT</tspan>
                 </text>
                 <text id="right" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="94" y="433">RIGHT</tspan>
+                    <tspan x="94.802" y="433">RIGHT</tspan>
                 </text>
-                <text id="direction" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="191.048" y="451">DIRECTION</tspan>
+                <text id="direction" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#00BE68">
+                    <tspan x="191.048" y="450">DIRECTION</tspan>
                 </text>
-                <line x1="192.5" y1="443.5" x2="229.5" y2="443.5" id="Line" stroke="#FFFFFF" stroke-linecap="square" mask="url(#mask-5)"></line>
-                <text id="speed" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="93.0145" y="443">SPEED</tspan>
+                <text id="speed" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#00BE68">
+                    <tspan x="94.0145" y="442">SPEED</tspan>
                 </text>
-                <line x1="94.5" y1="435.5" x2="115.5" y2="435.5" id="Line" stroke="#FFFFFF" stroke-linecap="square" mask="url(#mask-5)"></line>
-                <text id="Level" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="34.858" y="443">LEVEL</tspan>
+                <text id="Level" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#00BE68">
+                    <tspan x="35.358" y="442">LEVEL</tspan>
                 </text>
-                <line x1="35.5" y1="435.5" x2="55.5" y2="435.5" id="Line" stroke="#FFFFFF" stroke-linecap="square" mask="url(#mask-5)"></line>
-                <text id="mode" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#FFFFFF">
-                    <tspan x="63.041" y="471">MODE</tspan>
+                <text id="mode" mask="url(#mask-5)" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="7" font-weight="bold" letter-spacing="0.1" fill="#00BE68">
+                    <tspan x="64.541" y="470">MODE</tspan>
                 </text>
-                <line x1="63.5" y1="463.5" x2="85.5" y2="463.5" id="Line" stroke="#FFFFFF" stroke-linecap="square" mask="url(#mask-5)"></line>
                 <g id="green-stripes" mask="url(#mask-5)" fill="#009952">
                     <g transform="translate(27.000000, 561.000000)" id="Rectangle">
                         <rect x="0" y="0" width="126" height="5"></rect>
