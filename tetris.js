@@ -1,6 +1,5 @@
 import { Matrix } from './matrix.js';
 import { Figure } from './figure.js';
-import { arrayLast } from './utils.js';
 
 export class Tetris {
   container = null;
@@ -21,29 +20,8 @@ export class Tetris {
     this.iterationDuration = (config.speed || 100) * 10;
     this.container = document.getElementById('matrix');
     this.matrix = new Matrix(config.width, config.height, this.container);
-
-    window.addEventListener('keydown', e => {
-      const acceptedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowDown', 'KeyR'];
-      if (acceptedKeys.includes(e.code)) {
-        this.onKeyPress(e);
-      }
-    });
+    window.addEventListener('keydown', this.onKeyDown);
   }
-
-  onKeyPress = (e) => {
-    const actions = {
-      'ArrowLeft': () => this.currentFigure.moveLeft(),
-      'ArrowRight': () => this.currentFigure.moveRight(),
-      'ArrowDown': () => this.fastDescent(),
-      'KeyR': () => this.rotateCurrentFigure(),
-    };
-    const action = actions[e.code];
-    if (action) {
-      action();
-      this.matrix.render(this.currentFigure);
-      e.preventDefault();
-    }
-  };
 
   launchGame = () => {
     this.matrix.reset();
@@ -51,16 +29,13 @@ export class Tetris {
   };
 
   runIteration = () => {
-    this.matrix.clearFilledRows();
-
     this.currentFigure = new Figure(this.matrix);
-    this.currentFigure.spawn();
-
-    if ( this.isGameFailed(this.currentFigure) ) {
-      return this.onGameOver();
+    if (!this.currentFigure.fitsIntoMatrix()) {
+      return this.finishGame();
     }
-
+    this.matrix.clearFilledRows();
     this.matrix.render(this.currentFigure);
+
     this.descend(() => {
       console.log('Figure has been stacked', this.currentFigure);
       this.matrix.stackFigureOntoCanvas(this.currentFigure);
@@ -70,9 +45,8 @@ export class Tetris {
 
   descend = (callback) => {
     this.currentIterationTimeout = setTimeout(() => {
-      const distanceBelow = this.calculateShortestDistanceBelow();
-      if (distanceBelow > 0) {
-        this.currentFigure.moveDown();
+      if (this.currentFigure.canMove({ y: 1 })) {
+        this.currentFigure.move({ y: 1 });
         this.matrix.render(this.currentFigure);
         this.descend(callback);
       }
@@ -81,6 +55,27 @@ export class Tetris {
         callback();
       }
     }, this.iterationDuration);
+  };
+
+  onKeyDown = (e) => {
+    const actions = {
+      'ArrowLeft': () => this.moveCurrentFigureHorizontally(-1),
+      'ArrowRight': () => this.moveCurrentFigureHorizontally(1),
+      'ArrowDown': () => this.fastDescent(),
+      'Space': () => this.rotateCurrentFigure(),
+    };
+    const action = actions[e.code];
+    if (action) {
+      action();
+      this.matrix.render(this.currentFigure);
+      e.preventDefault();
+    }
+  };
+
+  moveCurrentFigureHorizontally = (delta) => {
+    if (this.currentFigure.canMove({ x: delta })) {
+      this.currentFigure.move({ x: delta });
+    }
   };
 
   rotateCurrentFigure = () => {
@@ -92,42 +87,9 @@ export class Tetris {
     // TODO: fix
   };
 
-  isGameFailed = () => {
-    // TODO: fix
-    return false;
-  };
-
-  onGameOver = () => {
+  finishGame = () => {
     // TODO: fix
     alert('Game over');
-  };
-
-  clearFilledLines = () => {
-    // TODO: fix
-  };
-
-  calculateShortestDistanceBelow = () => {
-    const figureLowestRow = arrayLast(this.currentFigure.data);
-    const figureLowestRowY = this.currentFigure.height + this.currentFigure.y;
-    const figureLowestPoints = [];
-    figureLowestRow.forEach((point, i) => {
-      if (point) {
-        figureLowestPoints.push([
-          this.currentFigure.x + i,
-          figureLowestRowY,
-        ]);
-      }
-    });
-    const distancesBelow = figureLowestPoints.map(([pointX, pointY]) => {
-      for (let matrixRowNumber = pointY; matrixRowNumber < this.matrix.canvas.length; matrixRowNumber++) {
-        const pointInRow = this.matrix.canvas[matrixRowNumber];
-        if (pointInRow[pointX]) {
-          return matrixRowNumber - pointY;
-        }
-      }
-      return this.matrix.canvas.length - pointY;
-    });
-    return distancesBelow.sort()[0];
   };
 }
 

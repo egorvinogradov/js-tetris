@@ -13,7 +13,7 @@ export class Matrix {
     this.reset();
   };
 
-  createClearCanvas = () => {
+  createEmptyCanvas = () => {
     const row = createArray(this.width, 0);
     return createArray(this.height, row);
   };
@@ -24,7 +24,7 @@ export class Matrix {
   createCanvasWithFigure = (figure) => {
     const canvasWithFigure = deepCloneArray(this.canvas);
 
-    figure.data.forEach((row, figureY) => {
+    figure.pixels.forEach((row, figureY) => {
       row.forEach((point, figureX) => {
         if (point) {
           const canvasX = figureX + figure.x;
@@ -65,7 +65,7 @@ export class Matrix {
   };
 
   reset = () => {
-    this.canvas = this.createClearCanvas();
+    this.canvas = this.createEmptyCanvas();
     this.render();
   };
 
@@ -81,7 +81,6 @@ export class Matrix {
         clearedCanvas.push(row);
       }
     });
-
     const emptyRow = createArray(this.width, 0);
     this.canvas = [
       ...createArray(newRowsCounter, emptyRow),
