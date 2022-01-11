@@ -38,14 +38,32 @@ export class Figure {
   };
 
   rotate = () => {
-    // TODO: check if can rotate (fail game)
-    // TODO: change x if rotating next to boundary on the right
-    let nextTypeIndex = this.typeIndex + 1;
-    if (nextTypeIndex >= FIGURE_TYPES[this.type].length) {
-      nextTypeIndex = 0;
+    const { x, y, pixels, typeIndex } = this.calculateNextRotation();
+    this.x = x;
+    this.y = y;
+    this.pixels = pixels;
+    this.typeIndex = typeIndex;
+  };
+
+  calculateNextRotation = () => {
+    let typeIndex = this.typeIndex + 1;
+    if (typeIndex >= FIGURE_TYPES[this.type].length) {
+      typeIndex = 0;
     }
-    this.pixels = FIGURE_TYPES[this.type][nextTypeIndex];
-    this.typeIndex = nextTypeIndex;
+    let pixels = FIGURE_TYPES[this.type][typeIndex];
+    let x = this.x;
+    let y = this.y;
+    let width = pixels[0].length;
+
+    if (x + width > this.matrix.width) {
+      x = this.matrix.width - width;
+    }
+    return { x, y, pixels, typeIndex };
+  };
+
+  canRotate = () => {
+    const { x, y, pixels } = this.calculateNextRotation();
+    return this.canFitFigureIntoMatrix(pixels, x, y);
   };
 
   /**

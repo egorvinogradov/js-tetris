@@ -15,17 +15,20 @@ export class Tetris {
    * @type {Figure}
    */
   currentFigure = null;
+  ongoingGameClassName = 'game--active';
 
   constructor(config){
     this.iterationDuration = (config.speed || 100) * 10;
     this.container = document.getElementById('matrix');
     this.matrix = new Matrix(config.width, config.height, this.container);
     window.addEventListener('keydown', this.onKeyDown);
+    document.getElementById('play-button').addEventListener('click', this.launchGame);
   }
 
   launchGame = () => {
     this.matrix.reset();
     this.runIteration();
+    document.body.classList.add(this.ongoingGameClassName);
   };
 
   runIteration = () => {
@@ -62,7 +65,10 @@ export class Tetris {
       'ArrowLeft': () => this.moveCurrentFigureHorizontally(-1),
       'ArrowRight': () => this.moveCurrentFigureHorizontally(1),
       'ArrowDown': () => this.fastDescent(),
+      'ArrowUp': () => this.rotateCurrentFigure(),
       'Space': () => this.rotateCurrentFigure(),
+      'KeyM': () => this.toggleMute(),
+      'Escape': () => this.exit(),
     };
     const action = actions[e.code];
     if (action) {
@@ -79,24 +85,39 @@ export class Tetris {
   };
 
   rotateCurrentFigure = () => {
-    this.currentFigure.rotate();
-    this.matrix.render(this.currentFigure);
+    if (this.currentFigure.canRotate()) {
+      this.currentFigure.rotate();
+      this.matrix.render(this.currentFigure);
+    }
   };
 
   fastDescent = () => {
-    // TODO: fix
+    if (this.currentFigure.canMove({ y: 1 })) {
+      this.currentFigure.move({ y: 1 });
+    }
   };
 
   finishGame = () => {
     // TODO: fix
     alert('Game over');
   };
+
+  toggleMute = () => {
+    // TODO: fix
+  };
+
+  exit = () => {
+    document.body.classList.remove(this.ongoingGameClassName);
+    clearTimeout(this.currentIterationTimeout);
+    requestAnimationFrame(() => {
+      this.matrix.reset();
+    });
+  };
 }
 
 
 window.tetris = new Tetris({
-  width: 10,
-  height: 10,
+  width: 20,
+  height: 30,
   speed: 100,
 });
-tetris.launchGame();
