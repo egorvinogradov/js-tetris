@@ -3,33 +3,99 @@
 <head>
   <meta charset="utf-8">
   <title>Tetris</title>
-  <style>
-    #matrix {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #matrix table {
-      border-collapse: collapse;
-      border: 1px solid black;
-    }
-    #matrix td {
-      width: 10px;
-      height: 10px;
-    }
-    .filled {
-      background: black;
-    }
-    .game--active {
-      background: rgba(0,0,0,.1);
-    }
-  </style>
+  <link rel="stylesheet" href="tetris.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" as="style">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="game--active2">
+
+<a class="logo" href="/">
+  <span class="logo-sign"><i></i><i></i><i></i><i></i></span>
+  BrickGame.net
+</a>
+
+<div class="credits">
+  View on <a href="https://github.com/egorvinogradov/js-tetris" target="_blank">Github</a>
+</div>
+
+<div class="play-button" id="play-button">&gt;Play</div>
+
+<div class="tetris">
+  <div class="screen">
+    <div class="screen-inner">
+      <div class="screen-panel">
+        <div class="screen-matrix"></div>
+      </div>
+    </div>
+  </div>
+  <div class="button-rotate button button--large">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">Rotate</div>
+    <div class="button-caption-secondary">Direction</div>
+  </div>
+  <div class="button-left button">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">Left</div>
+    <div class="button-caption-secondary">Level</div>
+  </div>
+  <div class="button-right button">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">Right</div>
+    <div class="button-caption-secondary">Speed</div>
+  </div>
+  <div class="button-down button">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">Down</div>
+    <div class="button-caption-secondary">Mode</div>
+  </div>
+  <div class="button-top-1 button button--small">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">Restart</div>
+  </div>
+  <div class="button-top-2 button button--small">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">On / Off</div>
+  </div>
+  <div class="button-top-3 button button--small">
+    <button class="button-knob"></button>
+    <div class="button-caption-primary">Mute</div>
+  </div>
+
+  <div class="figure-left">
+    <div class="figure-type-z"><i></i><i></i><i></i><i></i></div>
+    <div class="figure-type-t"><i></i><i></i><i></i><i></i></div>
+    <div class="figure-type-o"><i></i><i></i><i></i><i></i></div>
+    <div class="figure-type-l"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="figure-right">
+    <div class="figure-type-o"><i></i><i></i><i></i><i></i></div>
+    <div class="figure-type-l"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="figure-type-t"><i></i><i></i><i></i><i></i></div>
+    <div class="figure-type-z"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="flare-left">
+    <div class="flare-left-1"></div>
+    <div class="flare-left-2"></div>
+    <div class="flare-left-3"></div>
+  </div>
+  <div class="flare-right">
+    <div class="flare-right-1"></div>
+    <div class="flare-right-2"></div>
+    <div class="flare-right-3"></div>
+    <div class="flare-right-4"></div>
+  </div>
+  <div class="flare-bottom"></div>
+  <div class="curve"></div>
+  <div class="green-stripe-1"></div>
+  <div class="green-stripe-2"></div>
+</div>
+
+
 
 <div id="matrix"></div>
-<button id="play-button">>Play</button>
+
 
 <script type="module" src="utils.js"></script>
 <script type="module" src="matrix.js"></script>
