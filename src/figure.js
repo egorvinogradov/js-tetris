@@ -31,10 +31,18 @@ export class Figure {
     this.type = figureTypes[random(figureTypes.length - 1)];
     this.typeIndex = random(FIGURE_TYPES[this.type].length - 1);
     this.pixels = FIGURE_TYPES[this.type][this.typeIndex];
+    this.x = 0;
+    this.y = 0;
+  };
 
+  setRandomXPosition = () => {
     const maxPosX = this.matrix.width - this.width;
     this.x = random(maxPosX);
-    this.y = 0;
+  };
+
+  setMatrix = (newMatrix) => {
+    this.matrix = newMatrix;
+    return this;
   };
 
   rotate = () => {

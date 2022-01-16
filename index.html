@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <title>Tetris</title>
-  <link rel="stylesheet" href="tetris.css">
+  <link rel="stylesheet" href="src/assets/landing.css">
+  <link rel="stylesheet" href="src/assets/tetris.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Nova+Round&family=Press+Start+2P&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Nova+Round&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
-<body class="game--active">
+<body>
 
 <a class="logo" href="/" hidden>
   <span class="logo-sign"><i></i><i></i><i></i><i></i></span>
@@ -37,11 +38,18 @@
 </div>
 
 
-<div class="tetris">
+<div class="tetris landing-tetris">
   <div class="screen">
     <div class="screen-inner">
       <div class="screen-panel">
         <div class="screen-matrix" id="matrix"></div>
+        <div class="screen-caption screen-caption--next">Next</div>
+        <div class="screen-caption screen-caption--speed">Speed</div>
+        <div class="screen-caption screen-caption--level">Level</div>
+        <div class="screen-counter screen-counter--points">00873</div>
+        <div class="screen-counter screen-counter--speed">7</div>
+        <div class="screen-counter screen-counter--level">3</div>
+        <div class="screen-matrix screen-next-figure" id="next-figure-screen"></div>
       </div>
     </div>
   </div>
@@ -95,7 +103,7 @@
   <div class="glare-bottom"></div>
   <div class="glare-curve"></div>
   <div class="curve"></div>
-  <div class="noise">zzz</div>
+  <div class="noise"></div>
 
   <div class="brand">
     <div class="brand-logo">
@@ -109,19 +117,19 @@
 </div>
 
 
-<svg height="0">
+<svg width="0" height="0">
   <defs>
     <filter id="tetris-case-noise" x="0" y="0" width="100%" height="100%">
-      <feTurbulence baseFrequency="0.9 0.9" result="NOISE"/>
+      <feTurbulence baseFrequency="1.5 1.5" result="NOISE"/>
     </filter>
   </defs>
 </svg>
 
 
-<script type="module" src="utils.js"></script>
-<script type="module" src="matrix.js"></script>
-<script type="module" src="figure_types.js"></script>
-<script type="module" src="figure.js"></script>
-<script type="module" src="tetris.js"></script>
+<script type="module" src="src/utils.js"></script>
+<script type="module" src="src/matrix.js"></script>
+<script type="module" src="src/figure_types.js"></script>
+<script type="module" src="src/figure.js"></script>
+<script type="module" src="src/tetris.js"></script>
 </body>
 </html>

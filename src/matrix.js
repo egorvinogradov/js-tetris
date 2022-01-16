@@ -5,8 +5,9 @@ export class Matrix {
   height = 0;
   container = null;
   canvas = [];
+  canvasHash = '';
 
-  constructor(width, height, container){
+  constructor(container, width, height){
     this.width = width;
     this.height = height;
     this.container = container;
@@ -41,7 +42,6 @@ export class Matrix {
    */
   stackFigureOntoCanvas = (figure) => {
     this.canvas = this.createCanvasWithFigure(figure);
-    this.render();
   };
 
   /**
@@ -53,20 +53,30 @@ export class Matrix {
       canvas = this.createCanvasWithFigure(figure);
     }
 
-    const tableHtml = canvas.map(row => {
-      const rowHtml = row.map(cell => {
-        const className = cell ? 'filled' : 'empty';
-        return `<td class="${className}"></td>`;
+    if (this.didCanvasChange(canvas)) {
+      const tableHtml = canvas.map(row => {
+        const rowHtml = row.map(cell => {
+          const className = cell ? 'filled' : 'empty';
+          return `<td class="${className}"></td>`;
+        }).join('');
+        return `<tr>${rowHtml}</tr>`;
       }).join('');
-      return `<tr>${rowHtml}</tr>`;
-    }).join('');
 
-    this.container.innerHTML= `<table>${tableHtml}</table>`;
+      this.container.innerHTML= `<table>${tableHtml}</table>`;
+    }
+  };
+
+  didCanvasChange = (currentCanvas) => {
+    const currentCanvasHash = currentCanvas.map(row => {
+      return row.join('');
+    }).join('\n');
+    const didChange = currentCanvasHash !== this.canvasHash;
+    this.canvasHash = currentCanvasHash;
+    return didChange;
   };
 
   reset = () => {
     this.canvas = this.createEmptyCanvas();
-    this.render();
   };
 
   clearFilledRows = () => {
@@ -86,7 +96,6 @@ export class Matrix {
       ...createArray(newRowsCounter, emptyRow),
       ...clearedCanvas,
     ];
-    this.render();
   };
 
   isRowFilled = (row) => {

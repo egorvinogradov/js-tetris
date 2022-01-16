@@ -1,92 +1,6 @@
-body {
-  height: 100vh;
-  overflow: hidden;
-  background: #0033FF;
-  color: #FFFFFF;
-  font: 11px/11px 'Press Start 2P', 'Helvetica Neue', 'Arial', sans-serif;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  -webkit-font-smoothing: antialiased;
-}
-
-a {
-  color: #FFFFFF;
-  text-decoration: underline;
-}
-
-a:hover {
-  color: #FF4A00;
-}
-
-.logo {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  text-decoration: none;
-  padding-left: 25px;
-}
-
-.logo:hover {
-  color: #FFFFFF;
-}
-
-.logo-sign {
-  position: absolute;
-  display: flex;
-  flex-flow: wrap;
-  width: 12px;
-  left: 0;
-  transform: scale(1.2) translateY(5%);
-}
-
-.logo-sign i {
-  display: block;
-  width: 3px;
-  height: 4px;
-  margin: 0 1px 1px 0;
-  background: #FFFFFF;
-}
-
-.logo-sign i:last-child {
-  margin-left: 4px;
-}
-
-.credits {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
-
-
-
-
-
-.sidebar {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.sidebar-keys {
-
-}
-
-
-
-
-
-
-
-
-
-:root {
- --tetris-main-scale: 1.2;
- --tetris-main-translate-x: 50%;
- --tetris-main-translate-y: -5vh;
-
- --tetris-game-scale: 1;
- --tetris-game-translate-x: 0;
- --tetris-game-translate-y: 0;
+@font-face {
+  font-family: 'Crystal';
+  src: url('crystal.woff') format('woff');
 }
 
 
@@ -94,24 +8,8 @@ a:hover {
 /* TETRIS CASE */
 
 .tetris {
-  position: absolute;
-  width: 257px;
-  height: 601px;
-  left: 50%;
-  top: 50%;
-  margin-left: -130px;
-  margin-top: -300px;
-  transform-origin: center;
-  transform:
-    rotate(15deg)
-    scale(var(--tetris-main-scale))
-    translateX(var(--tetris-main-translate-x))
-    translateY(var(--tetris-main-translate-y));
   background: #353046;
   border-radius: 24px;
-  /*!*box-shadow: -37px 7px 44px 0 rgba(0,0,0,.28);*! TODO: fix*/
-  box-shadow: -20px -4px 25px -2px #0009AD;
-  transition: all 800ms;
   overflow: hidden;
 }
 
@@ -136,18 +34,6 @@ a:hover {
 .tetris:after {
   z-index: 6;
   box-shadow: inset -1px 0 8px 0 #0033FF;
-}
-
-.game--active .tetris {
-  transform:
-    rotate(0deg)
-    scale(var(--tetris-game-scale))
-    translateX(var(--tetris-game-translate-x))
-    translateY(var(--tetris-game-translate-y));
-}
-
-.game--active .play-button {
-  display: none;
 }
 
 .curve {
@@ -208,11 +94,20 @@ a:hover {
   background-image: linear-gradient(-45deg, #E3E9CC 0%, #B5BAA9 100%);
 }
 
-.screen-matrix {
+#matrix {
   position: absolute;
   border: 1px solid #000000;
-  top: 9px;
-  left: 3px;
+  top: 14px;
+  left: 2px;
+}
+
+#next-figure-screen {
+  position: absolute;
+  top: 40px;
+  right: -1px;
+}
+
+.screen-matrix {
   transform: scale(0.87);
   transform-origin: top left;
   opacity: 0.85;
@@ -246,6 +141,51 @@ a:hover {
   background: #365360;
   box-shadow: 0 1px 2px 0 rgba(0,0,0,0.28);
 }
+
+.screen-counter {
+  font: 12px/12px 'Crystal', 'Arial', sans-serif;
+  opacity: .8;
+}
+
+.screen-counter--points {
+  top: 14px;
+}
+
+.screen-counter--speed {
+  top: 88px;
+}
+
+.screen-counter--level {
+  top: 116px;
+}
+
+.screen-caption,
+.screen-counter {
+  position: absolute;
+  right: 1px;
+  width: 33px;
+  text-align: center;
+  letter-spacing: 0;
+  text-shadow: 0 0 1px rgba(0,0,0,.34);
+  color: #1D2D35;
+}
+
+.screen-caption {
+  font: bold 7px/7px 'Arial', sans-serif;
+  opacity: .7;
+}
+
+.screen-caption--next {
+  top: 28px;
+}
+
+.screen-caption--speed {
+  top: 78px;
+}
+.screen-caption--level {
+  top: 106px;
+}
+
 
 
 /* DECORATIVE FIGURES */
@@ -407,8 +347,6 @@ a:hover {
   border-radius: 5px;
   filter: blur(6px);
   z-index: 2;
-);
-
 }
 
 [class^=glare-] {
