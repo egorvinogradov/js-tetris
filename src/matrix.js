@@ -79,13 +79,13 @@ export class Matrix {
     this.canvas = this.createEmptyCanvas();
   };
 
-  clearFilledRows = () => {
-    let newRowsCounter = 0;
+  clearFilledRows = (callback) => {
+    let clearedRowsCounter = 0;
     let clearedCanvas = [];
 
     this.canvas.forEach(row => {
       if (this.isRowFilled(row)) {
-        newRowsCounter++;
+        clearedRowsCounter++;
       }
       else {
         clearedCanvas.push(row);
@@ -93,9 +93,10 @@ export class Matrix {
     });
     const emptyRow = createArray(this.width, 0);
     this.canvas = [
-      ...createArray(newRowsCounter, emptyRow),
+      ...createArray(clearedRowsCounter, emptyRow),
       ...clearedCanvas,
     ];
+    callback(clearedRowsCounter);
   };
 
   isRowFilled = (row) => {

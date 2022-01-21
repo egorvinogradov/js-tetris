@@ -1,6 +1,6 @@
 import { Matrix } from './matrix.js';
 import { Figure } from './figure.js';
-import { onDocumentKeyDown } from './utils.js';
+import { Sound } from './sound.js';
 
 export class Tetris {
 
@@ -10,12 +10,10 @@ export class Tetris {
   SPEED_X_MOVEMENT = 100;
   SPEED_X_MOVEMENT_SPED_UP = 100;
   SPEED_Y_MOVEMENT = 120;
-  SPEED_Y_MOVEMENT_SPED_UP = 20;
+  SPEED_Y_MOVEMENT_SPED_UP = 16;
 
   KEYDOWN_SPEED_UP_DELAY = 150;
 
-  level = 1;
-  score = 0;
   isPaused = false;
   descendInterval = null;
   keyDownFigureMovements = {};
@@ -54,9 +52,11 @@ export class Tetris {
     this.nextFigureScreen = new Matrix(nextFigureScreenContainer, 4, 4);
     this.nextFigureScreen.render();
 
+    this.sound = new Sound();
+
     this.enableGeneralKeys();
     this.enableMovementKeys();
-    this.launchScreenSaver();
+    this.showScreenSaver();
   }
 
   launchNewGame = () => {
@@ -92,7 +92,6 @@ export class Tetris {
       const actions = {
         'Enter': () => this.launchNewGame(),
         'KeyP': () => this.pauseOrResumeGame(),
-        'KeyM': () => this.toggleMute(),
         'ArrowUp': () => this.rotateCurrentFigure(),
       };
       const action = actions[key];
@@ -177,6 +176,7 @@ export class Tetris {
       this.matrix.render(this.currentFigure);
       return true;
     }
+    this.sound.figureMoved();
     return false;
   };
 
@@ -188,6 +188,7 @@ export class Tetris {
       }
       else if (key === 'ArrowDown') {
         this.stackCurrentFigureOntoCanvas();
+        this.sound.figureDropped();
       }
     }, this.keyDownFigureMovements[key].speed);
   };
@@ -237,7 +238,11 @@ export class Tetris {
     console.log('Figure has been stacked', this.currentFigure);
     clearInterval(this.descendInterval);
     this.matrix.stackFigureOntoCanvas(this.currentFigure);
-    this.matrix.clearFilledRows();
+    this.matrix.clearFilledRows(numberOfRows => {
+      if (numberOfRows) {
+        this.sound.rowCleared();
+      }
+    });
     this.matrix.render();
     this.spawnNewCurrentFigure();
     this.dropCurrentFigure();
@@ -251,22 +256,20 @@ export class Tetris {
       this.currentFigure.rotate();
       this.matrix.render(this.currentFigure);
     }
+    this.sound.figureRotated();
   };
 
-  toggleMute = () => {
-    console.error('__ MUTE');
-  };
-
-  launchScreenSaver = () => {
+  showScreenSaver = () => {
     console.error('__ SCREEN SAVER');
   };
 
-  quitScreenSaver = () => {
-    console.error('__ QUIT SAVER');
+  showGameOverScreen = () => {
+    console.error('__ GAME OVER');
   };
 
   onGameFailed = () => {
-    alert('Game over');
+    this.showGameOverScreen();
+    this.sound.gameOver();
   };
 }
 

@@ -24,26 +24,3 @@ export function deepCloneArray(array) {
 export function setCSSVariable(key, value) {
   document.documentElement.style.setProperty(key, value);
 }
-
-export function throttle(func, duration) {
-  let isWaiting = false;
-  return function () {
-    if (!isWaiting) {
-      isWaiting = true;
-      func.apply(this, arguments);
-      setTimeout(() => {
-        isWaiting = false;
-      }, duration);
-    }
-  };
-}
-
-export function onDocumentKeyDown(actions) {
-  document.addEventListener('keydown', e => {
-    const key = e.code;
-    const action = actions[key];
-    if (action) {
-      action();
-    }
-  });
-}
