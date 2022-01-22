@@ -10,7 +10,7 @@ export class Tetris {
   SPEED_X_MOVEMENT = 100;
   SPEED_X_MOVEMENT_SPED_UP = 100;
   SPEED_Y_MOVEMENT = 120;
-  SPEED_Y_MOVEMENT_SPED_UP = 16;
+  SPEED_Y_MOVEMENT_SPED_UP = 10;
 
   KEYDOWN_SPEED_UP_DELAY = 150;
 
@@ -63,6 +63,9 @@ export class Tetris {
     document.body.classList.add(this.ONGOING_GAME_CLASSNAME);
     this.matrix.reset();
     this.nextFigureScreen.reset();
+
+    this.sound.startBackgroundNoise();
+    // this.sound.intro();
 
     this.spawnNewCurrentFigure();
     this.dropCurrentFigure();
@@ -139,6 +142,7 @@ export class Tetris {
       this.keyDownFigureMovements[key] = { speed, timeout: null };
       this.attemptMovingCurrentFigure(delta);
       this.moveCurrentFigureRecursively(key, delta);
+      this.sound.figureMoved();
     }
     if (stage === 'speedup') {
       this.keyDownFigureMovements[key].speed = this.getMovementSpeed(key, stage);
@@ -176,7 +180,6 @@ export class Tetris {
       this.matrix.render(this.currentFigure);
       return true;
     }
-    this.sound.figureMoved();
     return false;
   };
 
