@@ -345,4 +345,3 @@ window.onload = () => {
     nextFigureScreenContainer: document.getElementById('next-figure-screen'),
   });
 };
-

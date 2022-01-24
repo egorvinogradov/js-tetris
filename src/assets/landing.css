@@ -1,5 +1,10 @@
 @import './variables.css';
 
+@font-face {
+  font-family: 'Press Start';
+  src: url('fonts/PressStart2P-Regular.woff') format('woff');
+}
+
 body {
   height: 100vh;
   overflow: hidden;
