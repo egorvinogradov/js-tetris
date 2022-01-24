@@ -1,0 +1,33 @@
+:root {
+  --position-tetris-scale: 1.2;
+  --position-tetris-translate-x: 50%;
+  --position-tetris-translate-y: -5.5%;
+
+  --position-tetris-ongoing-game-scale: 1.8;
+  --position-tetris-ongoing-game-translate-x: 0;
+  --position-tetris-ongoing-game-translate-y: 22.5%;
+
+  --landing-font-family: 'Press Start 2P', 'Helvetica Neue', 'Arial', sans-serif;
+  --landing-font-size: 1.652vh;
+  --landing-letter-spacing: 0.14em;
+  --landing-color-text: #FFFFFF;
+  --landing-color-text-hover: #FF4A00;
+  --landing-color-text-keys: #FFDE00;
+  --landing-color-background: #0033FF;
+
+  --tetris-color-case: #353046;
+  --tetris-color-glare: #FFFFFF;
+  --tetris-color-button: #FFDE00;
+  --tetris-color-screen-filled: #365360;
+  --tetris-color-screen-empty: #BFC6AF;
+
+  --tetris-color-paint-red: #E02530;
+  --tetris-color-paint-green: #00BE68;
+  --tetris-color-paint-green-dark: #009952;
+
+  --tetris-font-family-text: 'Arial', sans-serif;
+  --tetris-font-family-brand: 'Nova Round', 'Arial', sans-serif;
+  --tetris-font-family-screen: 'Crystal', 'Arial', sans-serif;
+
+  --tetris-border-radius: 24px;
+}

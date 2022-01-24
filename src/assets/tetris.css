@@ -1,3 +1,5 @@
+@import './variables.css';
+
 @font-face {
   font-family: 'Crystal';
   src: url('crystal.woff') format('woff');
@@ -8,8 +10,8 @@
 /* TETRIS CASE */
 
 .tetris {
-  background: #353046;
-  border-radius: 24px;
+  background: var(--tetris-color-case);
+  border-radius: var(--tetris-border-radius);
   overflow: hidden;
 }
 
@@ -21,19 +23,19 @@
   bottom: 0;
   right: 0;
   left: 0;
-  border-radius: 24px;
+  border-radius: var(--tetris-border-radius);
   pointer-events: none;
 }
 
 .tetris:before {
   z-index: 5;
-  opacity: .5;
+  opacity: 0.5;
   box-shadow: inset -1px 1px 9px 13px #000000;
 }
 
 .tetris:after {
   z-index: 6;
-  box-shadow: inset -1px 0 8px 0 #0033FF;
+  box-shadow: inset -1px 0 8px 0 var(--landing-color-background);
 }
 
 .curve {
@@ -42,7 +44,7 @@
   left: 0;
   right: 0;
   height: 110px;
-  background-image: linear-gradient(180deg, #353046 2%, #131024 19%, #14112A 26%, #3A344E 47%, #131022 73%, #131022 82%, #353046 100%);
+  background-image: linear-gradient(180deg, var(--tetris-color-case) 2%, #131024 19%, #14112A 26%, #3A344E 47%, #131022 73%, #131022 82%, var(--tetris-color-case) 100%);
   border-radius: 8px;
 }
 
@@ -53,7 +55,7 @@
   left: 0;
   right: 0;
   z-index: 2;
-  opacity: .35;
+  opacity: 0.35;
   filter: url(#tetris-case-noise) grayscale(100%) contrast(6);
   pointer-events: none;
 }
@@ -70,7 +72,7 @@
   width: 147px;
   height: 184px;
   background: linear-gradient(-115deg, #65586F 0%, #967F91 100%);
-  box-shadow: 0 0 0 2px #E02530;
+  box-shadow: 0 0 0 2px var(--tetris-color-paint-red);
 }
 
 .screen-inner {
@@ -80,7 +82,7 @@
   left: 0;
   right: 0;
   border-style: solid;
-  border-color: #353046 transparent;
+  border-color: var(--tetris-color-case) transparent;
   border-width: 13px 18px;
 }
 
@@ -90,8 +92,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.59), inset 0 0 0 1px rgba(0,0,0,.59);
   background-image: linear-gradient(-45deg, #E3E9CC 0%, #B5BAA9 100%);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.59),
+    inset 0 0 0 1px rgba(0,0,0,.59);
 }
 
 #matrix {
@@ -121,30 +125,30 @@
 .screen-matrix td {
   width: 3px;
   height: 3px;
-  border: 1px solid #C6CDB6;
+  border: 1px solid var(--tetris-color-screen-empty);
 }
 
 .screen-matrix td:after {
   content: '';
   display: block;
   height: 100%;
-  background: #C6CDB6;
+  background: var(--tetris-color-screen-empty);
   border-radius: 1px;
 }
 
 .screen-matrix td.filled {
-  border: 1px solid #365360;
+  border: 1px solid var(--tetris-color-screen-filled);
   box-shadow: 0 1px 2px 0 rgba(0,0,0,0.18);
 }
 
 .screen-matrix td.filled:after {
-  background: #365360;
+  background: var(--tetris-color-screen-filled);
   box-shadow: 0 1px 2px 0 rgba(0,0,0,0.28);
 }
 
 .screen-counter {
-  font: 12px/12px 'Crystal', 'Arial', sans-serif;
-  opacity: .8;
+  font: 12px/12px var(--tetris-font-family-screen);
+  opacity: 0.8;
 }
 
 .screen-counter--points {
@@ -171,8 +175,8 @@
 }
 
 .screen-caption {
-  font: bold 7px/7px 'Arial', sans-serif;
-  opacity: .7;
+  font: bold 7px/7px var(--tetris-font-family-text);
+  opacity: 0.7;
 }
 
 .screen-caption--next {
@@ -202,26 +206,26 @@
   left: 209px;
 }
 
-[class^="figure-type-"] {
+[class^=figure-type-] {
   display: flex;
   flex-flow: wrap;
   width: 30px;
   margin-bottom: 11px;
 }
 
-[class^="figure-type-"] > i {
+[class^=figure-type-] > i {
   position: relative;
   width: 9px;
   height: 9px;
-  border: 1px solid #00BE68;
+  border: 1px solid var(--tetris-color-paint-green);
   margin: 0 2px 2px 0;
 }
 
-[class^="figure-type-"] > i:after {
+[class^=figure-type-] > i:after {
   content: '';
   width: 6px;
   height: 6px;
-  background: #00BE68;
+  background: var(--tetris-color-paint-green);
   position: absolute;
   top: 1px;
   right: 1px;
@@ -249,13 +253,13 @@
   top: 17px;
   left: 17px;
   z-index: 1;
-  opacity: .2;
+  opacity: 0.2;
 }
 
 .glare-left > i {
   position: absolute;
   width: 3px;
-  background: #FFFFFF;
+  background: var(--tetris-color-glare);
   border-radius: 2px;
   filter: blur(3px);
 }
@@ -289,7 +293,7 @@
 .glare-right > i {
   position: absolute;
   right: 2px;
-  background: #FFFFFF;
+  background: var(--tetris-color-glare);
   border-radius: 2px;
   filter: blur(3px);
 }
@@ -313,7 +317,7 @@
   width: 22px;
   height: 253px;
   opacity: 0.5;
-  background: linear-gradient(270deg, #FFFFFF 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(270deg, var(--tetris-color-glare) 0%, rgba(255,255,255,0) 100%);
 }
 
 .glare-right > i:nth-child(4) {
@@ -330,7 +334,7 @@
   width: 213px;
   height: 247px;
   opacity: 0.2;
-  background-image: linear-gradient(238deg, #FFFFFF 0%, rgba(255,255,255, 0) 52%);
+  background-image: linear-gradient(238deg, var(--tetris-color-glare) 0%, rgba(255,255,255, 0) 52%);
   border-radius: 5px;
   filter: blur(6px);
   z-index: 1;
@@ -342,8 +346,8 @@
   top: 271px;
   width: 222px;
   height: 9px;
-  opacity: .77;
-  background-image: linear-gradient(270deg, #FFFFFF 0%, rgba(255,255,255,.05) 96%);
+  opacity: 0.77;
+  background-image: linear-gradient(270deg, var(--tetris-color-glare) 0%, rgba(255,255,255,.05) 96%);
   border-radius: 5px;
   filter: blur(6px);
   z-index: 2;
@@ -373,7 +377,7 @@
 }
 
 .brand-logo-name {
-  font: 37px/33px 'Nova Round', 'Helvetica Neue', 'Arial', sans-serif;
+  font: 37px/33px var(--tetris-font-family-brand);
   letter-spacing: -0.1em;
   margin-left: 30px;
 }
@@ -384,7 +388,7 @@
 }
 
 .brand-caption {
-  font: bold 15px/15px 'Helvetica Neue', 'Arial', sans-serif;
+  font: bold 15px/15px var(--tetris-font-family-text);
   letter-spacing: 0;
   text-align: right;
   margin-right: -4px;
@@ -395,7 +399,7 @@
   position: absolute;
   left: 132px;
   bottom: -4px;
-  font: bold 13px/13px 'Helvetica Neue', 'Arial', sans-serif;
+  font: bold 13px/13px var(--tetris-font-family-text);
   letter-spacing: 0;
 }
 
@@ -404,7 +408,7 @@
   bottom: 0;
   width: 126px;
   height: 5px;
-  background: #009952;
+  background: var(--tetris-color-paint-green-dark);
 }
 
 .brand-stripe-2 {
@@ -413,7 +417,7 @@
   bottom: 0;
   width: 26px;
   height: 5px;
-  background: #009952;
+  background: var(--tetris-color-paint-green-dark);
 }
 
 
@@ -441,7 +445,7 @@
   height: 26px;
   border-radius: 100%;
   overflow: hidden;
-  background: #ffde00;
+  background: var(--tetris-color-button);
   border: 0;
   box-shadow:
     0 0 1px 2px rgba(11,11,11,.2),
@@ -459,7 +463,7 @@
   height: 37%;
   opacity: 0.69;
   transform: rotate(45deg);
-  background: #FFFFFF;
+  background: var(--tetris-color-glare);
   border-radius: 6px;
   filter: blur(3px);
 }
@@ -472,7 +476,7 @@
   width: 50%;
   height: 50%;
   transform: rotate(45deg);
-  background-image: linear-gradient(224deg, #FFFFFF 0%, rgba(255,255,255,.41) 100%);
+  background-image: linear-gradient(224deg, var(--tetris-color-glare) 0%, rgba(255,255,255,.41) 100%);
   border-radius: 6px;
   filter: blur(3px);
 }
@@ -482,8 +486,7 @@
 }
 
 .button-caption {
-  font: 7px/7px 'Arial', sans-serif;
-  color: #FFFFFF;
+  font: 7px/7px var(--tetris-font-family-text);
   text-align: center;
   margin-left: -26%;
   width: 160%;
@@ -496,7 +499,7 @@
 
 .button-caption--secondary {
   top: calc(100% + 16px);
-  color: #00BE68;
+  color: var(--tetris-color-paint-green);
 }
 
 .button--large .button-knob {
@@ -526,7 +529,7 @@
 
 .button-rotate {
   top: 383px;
-  right: 27px;
+  right: 31px;
 }
 
 .button-left {

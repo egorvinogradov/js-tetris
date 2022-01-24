@@ -1,10 +1,17 @@
 import { Matrix } from './matrix.js';
 import { Figure } from './figure.js';
 import { Sound } from './sound.js';
+import { addBodyClass, removeBodyClass, setCSSVariable } from './utils.js';
 
 export class Tetris {
 
-  ONGOING_GAME_CLASSNAME = 'game--active';
+  CLASSNAME_INITIALIZED = 'initialized';
+  CLASSNAME_ONGOING_GAME = 'ongoing-game';
+  CLASSNAME_PAUSED = 'paused';
+
+  TETRIS_ORIGINAL_HEIGHT = 601;
+  TETRIS_TO_WINDOW_HEIGHT_RATIO = 1.082;
+  TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME = 1.624;
 
   SPEED_DESCEND = 1000;
   SPEED_X_MOVEMENT = 100;
@@ -14,6 +21,7 @@ export class Tetris {
 
   KEYDOWN_SPEED_UP_DELAY = 150;
 
+  isOngoingGame = false;
   isPaused = false;
   descendInterval = null;
   keyDownFigureMovements = {};
@@ -54,47 +62,100 @@ export class Tetris {
 
     this.sound = new Sound();
 
+    this.animateLogo();
+    this.scaleTetris();
     this.enableGeneralKeys();
     this.enableMovementKeys();
     this.showScreenSaver();
+
+    window.addEventListener('resize', this.scaleTetris);
+    requestAnimationFrame(() => {
+      addBodyClass(this.CLASSNAME_INITIALIZED);
+    });
   }
 
+  animateLogo = () => {
+    const logoElement = document.querySelector('.logo');
+    const interval = 5000;
+    let stage = 0;
+    setInterval(() => {
+      stage = stage > 2 ? 0 : stage + 1;
+      if (!stage) {
+        logoElement.className = 'logo';
+      }
+      else {
+        logoElement.classList.add('logo--frame-' + stage);
+      }
+    }, interval);
+  };
+
+  scaleTetris = () => {
+    const ratio = this.isOngoingGame
+      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME
+      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
+
+    const cssVariableName = this.isOngoingGame
+      ? '--position-tetris-ongoing-game-scale'
+      : '--position-tetris-scale';
+
+    const tetrisHeight = window.innerHeight * ratio;
+    const tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
+    setCSSVariable(cssVariableName, tetrisScale);
+  };
+
   launchNewGame = () => {
-    document.body.classList.add(this.ONGOING_GAME_CLASSNAME);
+    addBodyClass(this.CLASSNAME_ONGOING_GAME);
+    requestAnimationFrame(this.scaleTetris);
+
+    this.isOngoingGame = true;
+
     this.matrix.reset();
     this.nextFigureScreen.reset();
 
     this.sound.startBackgroundNoise();
-    // this.sound.intro();
+    // this.sound.intro(); // TODO: fix
 
     this.spawnNewCurrentFigure();
     this.dropCurrentFigure();
   };
 
   pauseOrResumeGame = () => {
-    this.isPaused = !this.isPaused;
+    if (this.isOngoingGame) {
+      this.isPaused = !this.isPaused;
+      this.isPaused ? addBodyClass(this.CLASSNAME_PAUSED) : removeBodyClass(this.CLASSNAME_PAUSED);
+    }
   };
 
   quitGame = () => {
     this.currentFigure = null;
     this.nextFigure = null;
+
+    this.isOngoingGame = false;
+    this.isPaused = false;
+
     this.matrix.reset();
     this.nextFigureScreen.reset();
 
     requestAnimationFrame(() => {
       this.matrix.render();
       this.nextFigureScreen.render();
-      document.body.classList.remove(this.ONGOING_GAME_CLASSNAME);
+
+      removeBodyClass(this.CLASSNAME_PAUSED);
+      removeBodyClass(this.CLASSNAME_ONGOING_GAME);
+      requestAnimationFrame(this.scaleTetris);
     });
   };
 
   enableGeneralKeys = () => {
-    document.getElementById('play-button').addEventListener('click', this.launchNewGame);
+    document.querySelector('.menu-play').addEventListener('click', this.launchNewGame);
+    document.querySelector('.options-paused').addEventListener('click', this.pauseOrResumeGame);
     document.addEventListener('keydown', e => {
       const key = e.code;
       const actions = {
         'Enter': () => this.launchNewGame(),
         'KeyP': () => this.pauseOrResumeGame(),
+        'Escape': () => this.quitGame(),
+        'Space': () => this.rotateCurrentFigure(),
         'ArrowUp': () => this.rotateCurrentFigure(),
       };
       const action = actions[key];
@@ -276,10 +337,12 @@ export class Tetris {
   };
 }
 
+window.onload = () => {
+  window.tetris = new Tetris({
+    matrixWidth: 10,
+    matrixHeight: 20,
+    matrixContainer: document.getElementById('matrix'),
+    nextFigureScreenContainer: document.getElementById('next-figure-screen'),
+  });
+};
 
-window.tetris = new Tetris({
-  matrixWidth: 10,
-  matrixHeight: 20,
-  matrixContainer: document.getElementById('matrix'),
-  nextFigureScreenContainer: document.getElementById('next-figure-screen'),
-});

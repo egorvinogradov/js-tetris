@@ -1,89 +1,270 @@
+@import './variables.css';
+
 body {
   height: 100vh;
   overflow: hidden;
-  background: #0033FF;
-  color: #FFFFFF;
-  font: 11px/11px 'Press Start 2P', 'Helvetica Neue', 'Arial', sans-serif;
-  letter-spacing: 0.14em;
+  background: var(--landing-color-background);
+  padding: 0;
+  margin: 0;
+}
+
+body, button, kbd {
+  color: var(--landing-color-text);
+  font: var(--landing-font-size)/var(--landing-font-size) var(--landing-font-family);
+  letter-spacing: var(--landing-letter-spacing);
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
 }
 
+a, button {
+  outline: none;
+}
+
 a {
-  color: #FFFFFF;
+  color: var(--landing-color-text);
   text-decoration: underline;
 }
 
 a:hover {
-  color: #FF4A00;
+  color: var(--landing-color-text-hover);
 }
+
+
+
+/* LOGO */
 
 .logo {
   position: absolute;
-  top: 30px;
-  left: 30px;
-  text-decoration: none;
-  padding-left: 25px;
+  top: 4vh;
+  left: 4vh;
+  --logo-square-shift: 8px;
 }
 
-.logo:hover {
-  color: #FFFFFF;
+.logo .figure-type-o {
+  width: calc(var(--logo-square-shift) * 3);
 }
 
-.logo-sign {
-  position: absolute;
-  display: flex;
-  flex-flow: wrap;
-  width: 12px;
-  left: 0;
-  transform: scale(1.2) translateY(5%);
+.logo .figure-type-o i {
+  border: 0;
+  background: white;
+  transition: transform 400ms;
+  width: 6px;
+  height: 6px;
+  margin: 0 2px 2px 0;
 }
 
-.logo-sign i {
-  display: block;
-  width: 3px;
-  height: 4px;
-  margin: 0 1px 1px 0;
-  background: #FFFFFF;
+.logo .figure-type-o i:after {
+  background: var(--landing-color-text);
+  display: none;
 }
 
-.logo-sign i:last-child {
-  margin-left: 4px;
+.logo--frame-1 .figure-type-o i:nth-child(4) {
+  transform: translateX(var(--logo-square-shift));
 }
+
+.logo--frame-2 .figure-type-o i:nth-child(1) {
+  transform: translateY(var(--logo-square-shift));
+}
+
+.logo--frame-3 .figure-type-o i:nth-child(2),
+.logo--frame-3 .figure-type-o i:nth-child(3) {
+  transform: translateX(calc(var(--logo-square-shift)* -1));
+}
+
+
+
+/* CREDITS */
 
 .credits {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 3.5vh;
+  right: 3.5vh;
 }
 
-.sidebar {
+
+
+/* OPTIONS */
+
+.options {
+  position: absolute;
+  z-index: 1;
+  top: 5.2vh;
+  right: 4vh;
+}
+
+.options-sound {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.options-sound-icon,
+.options-sound-icon:before,
+.options-sound-icon:after {
+  content: '';
+  width: 3px;
+  background: var(--landing-color-text);
+}
+
+.options-sound-icon {
+  display: inline-block;
+  margin-top: -1px;
+  margin-right: 13px;
+  vertical-align: middle;
+  position: relative;
+  height: 6px;
+}
+
+.options-sound-icon:before {
+  position: absolute;
+  left: -5px;
+  bottom: 0;
+  height: 50%;
+}
+
+.options-sound-icon:after {
+  position: absolute;
+  right: -5px;
+  bottom: 0;
+  height: 150%;
+}
+
+.muted .options-sound .options-sound-icon {
+  background: none;
+}
+
+.muted .options-sound .options-sound-icon:before {
+  content: '×';
+  height: 100%;
+  background: none;
+  font-style: normal;
+  font-size: 2.4vh;
+  line-height: 1vh;
+}
+
+.muted .options-sound .options-sound-icon:after {
+  display: none;
+}
+
+.options-paused {
+  padding-top: 3vh;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.paused .options-paused {
+  opacity: 1;
+  cursor: pointer;
+  pointer-events: inherit;
+  animation: blink 1.7s step-end 0s infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+
+
+/* MENU */
+
+.menu {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translateX(calc(-100% - 7.5vh)) translateY(-50%);
 }
 
-.sidebar-keys {
+.ongoing-game .menu {
+  transform: translateX(calc(-100% - 25vh)) translateY(-50%);
+}
 
+.ongoing-game .menu-play,
+.ongoing-game .menu-keyboard-extra {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu-play {
+  border: 0;
+  background: none;
+  font-size: 3.1vh !important;
+  position: relative;
+  cursor: pointer;
+  margin: 5vh 0;
+  padding: 0;
+  transition: opacity 500ms;
+  word-spacing: -1.1vh;
+}
+
+.menu-play:before {
+  content: '>';
+  position: absolute;
+  right: calc(100% + 1.45vh);
+  top: 0;
+}
+
+.menu-play:after {
+  display: none;
+
+  content: '';
+  position: absolute;
+  width: calc(100% - 1.5vh);
+  height: 0.6vh;
+  background: var(--landing-color-text);
+  bottom: -0.45vh;
+  left: 0;
+}
+
+.menu-play:hover,
+.menu-play:hover:before {
+  color: var(--landing-color-text-hover);
+}
+
+.menu-play:hover:after {
+  background: var(--landing-color-text-hover);
+}
+
+.menu-keyboard {
+  border-collapse: collapse;
+  border: 0;
+}
+
+.menu-keyboard td {
+  vertical-align: top;
+  padding: 0 0 3.3vh 0;
+  white-space: nowrap;
+  border: 0;
+}
+
+.menu-keyboard-keys {
+  text-align: right;
+  word-spacing: -1em;
+  padding-right: 2.25vh !important;
+}
+
+.menu-keyboard-keys kbd {
+  color: var(--landing-color-text-keys);
+}
+
+.menu-keyboard-keys kbd:before {
+  content: '[';
+}
+
+.menu-keyboard-keys kbd:after {
+  content: ']';
+}
+
+.menu-keyboard-rotate-clockwise {
+  transform: translate(-0.3vh, 0.15vh) rotate(90deg);
+  display: inline-block;
 }
 
 
 
 /* TETRIS */
-
-:root {
-  --tetris-main-scale: 1.2;
-  --tetris-main-translate-x: 50%;
-  --tetris-main-translate-y: -5vh;
-
-  /*--tetris-game-scale: 1;*/
-  /*--tetris-game-translate-x: 0;*/
-  /*--tetris-game-translate-y: 0;*/
-
-  --tetris-game-scale: 1.33;
-  --tetris-game-translate-x: 0;
-  --tetris-game-translate-y: 77px;
-}
 
 .landing-tetris {
   position: absolute;
@@ -96,22 +277,43 @@ a:hover {
   transform-origin: center;
   transform:
     rotate(15deg)
-    scale(var(--tetris-main-scale))
-    translateX(var(--tetris-main-translate-x))
-    translateY(var(--tetris-main-translate-y));
-  /*!*box-shadow: -37px 7px 44px 0 rgba(0,0,0,.28);*! TODO: fix*/
+    scale(var(--position-tetris-scale))
+    translateX(var(--position-tetris-translate-x))
+    translateY(var(--position-tetris-translate-y));
   box-shadow: -20px -4px 25px -2px #0009AD;
-  transition: all 800ms;
 }
 
-.game--active .tetris {
+.ongoing-game .landing-tetris {
   transform:
-    rotate(0deg)
-    scale(var(--tetris-game-scale))
-    translateX(var(--tetris-game-translate-x))
-    translateY(var(--tetris-game-translate-y));
+    rotate(0.5deg)
+    scale(var(--position-tetris-ongoing-game-scale))
+    translateX(var(--position-tetris-ongoing-game-translate-x))
+    translateY(var(--position-tetris-ongoing-game-translate-y));
 }
 
-.game--active .play-button {
-  display: none;
+
+
+/* SWITCHING STATES */
+
+.logo,
+.menu,
+.credits,
+.landing-tetris {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+.initialized .logo,
+.initialized .credits,
+.initialized .menu,
+.initialized .landing-tetris {
+  opacity: 1;
+}
+
+.initialized .menu {
+  transition: transform 800ms;
+}
+
+.initialized .landing-tetris {
+  transition: opacity 300ms, transform 800ms;
 }

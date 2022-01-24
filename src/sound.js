@@ -1,4 +1,8 @@
+import { addBodyClass, removeBodyClass } from './utils.js';
+
 export class Sound {
+
+  CLASSNAME_MUTED = 'muted';
 
   INTRO = './src/assets/audio/intro.mp3';
   BACKGROUND = './src/assets/audio/background.mp3';
@@ -23,9 +27,13 @@ export class Sound {
   constructor(){
     this.isMute = JSON.parse(localStorage['mute'] || false);
     this.enableMuteSwitcher();
+    if (this.isMute) {
+      addBodyClass(this.CLASSNAME_MUTED);
+    }
   }
 
   enableMuteSwitcher = () => {
+    document.querySelector('.options-sound').addEventListener('click', this.toggleMute);
     document.addEventListener('keydown', e => {
       if (e.code === 'KeyM') {
         this.toggleMute();
@@ -43,9 +51,11 @@ export class Sound {
 
     if (isMute) {
       this.stopBackgroundNoise();
+      addBodyClass(this.CLASSNAME_MUTED);
     }
     else {
       this.startBackgroundNoise();
+      removeBodyClass(this.CLASSNAME_MUTED);
     }
   };
 

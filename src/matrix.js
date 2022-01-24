@@ -56,8 +56,8 @@ export class Matrix {
     if (this.didCanvasChange(canvas)) {
       const tableHtml = canvas.map(row => {
         const rowHtml = row.map(cell => {
-          const className = cell ? 'filled' : 'empty';
-          return `<td class="${className}"></td>`;
+          const attributes = cell ? ' class="filled"' : '';
+          return `<td${attributes}></td>`;
         }).join('');
         return `<tr>${rowHtml}</tr>`;
       }).join('');

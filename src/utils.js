@@ -24,3 +24,11 @@ export function deepCloneArray(array) {
 export function setCSSVariable(key, value) {
   document.documentElement.style.setProperty(key, value);
 }
+
+export function addBodyClass(className) {
+  document.body.classList.add(className);
+}
+
+export function removeBodyClass(className) {
+  document.body.classList.remove(className);
+}
