@@ -27,7 +27,7 @@
 
   --tetris-font-family-text: 'Arial', sans-serif;
   --tetris-font-family-brand: 'Pump Light', 'Arial', sans-serif;
-  --tetris-font-family-screen: 'Tetris Screen', 'Arial', sans-serif;
+  --tetris-font-family-screen: 'Tetris Screen', monospace;
 
   --tetris-border-radius: 24px;
 }

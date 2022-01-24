@@ -30,7 +30,7 @@ export class Tetris {
   /**
    * @type {Matrix}
    */
-  matrix = null;
+  gameScreen = null;
 
   /**
    * @type {Matrix}
@@ -49,14 +49,14 @@ export class Tetris {
 
   constructor(config){
     const {
-      matrixWidth,
-      matrixHeight,
-      matrixContainer,
+      gameWidth,
+      gameHeight,
+      gameScreenContainer,
       nextFigureScreenContainer,
     } = config;
 
-    this.matrix = new Matrix(matrixContainer, matrixWidth, matrixHeight);
-    this.matrix.render();
+    this.gameScreen = new Matrix(gameScreenContainer, gameWidth, gameHeight);
+    this.gameScreen.render();
     this.nextFigureScreen = new Matrix(nextFigureScreenContainer, 4, 4);
     this.nextFigureScreen.render();
 
@@ -109,7 +109,7 @@ export class Tetris {
 
     this.isOngoingGame = true;
 
-    this.matrix.reset();
+    this.gameScreen.reset();
     this.nextFigureScreen.reset();
 
     this.sound.startBackgroundNoise();
@@ -133,11 +133,11 @@ export class Tetris {
     this.isOngoingGame = false;
     this.isPaused = false;
 
-    this.matrix.reset();
+    this.gameScreen.reset();
     this.nextFigureScreen.reset();
 
     requestAnimationFrame(() => {
-      this.matrix.render();
+      this.gameScreen.render();
       this.nextFigureScreen.render();
 
       removeBodyClass(this.CLASSNAME_PAUSED);
@@ -238,7 +238,7 @@ export class Tetris {
   attemptMovingCurrentFigure = (delta) => {
     if (this.currentFigure.canMove(delta)) {
       this.currentFigure.move(delta);
-      this.matrix.render(this.currentFigure);
+      this.gameScreen.render(this.currentFigure);
       return true;
     }
     return false;
@@ -260,13 +260,13 @@ export class Tetris {
   spawnNewCurrentFigure = () => {
     if (this.nextFigure) {
       this.currentFigure = this.nextFigure;
-      this.currentFigure.setMatrix(this.matrix);
+      this.currentFigure.setMatrix(this.gameScreen);
     }
     else {
-      this.currentFigure = new Figure(this.matrix);
+      this.currentFigure = new Figure(this.gameScreen);
     }
     this.currentFigure.setRandomXPosition();
-    this.matrix.render(this.currentFigure);
+    this.gameScreen.render(this.currentFigure);
 
     this.nextFigure = new Figure(this.nextFigureScreen);
     this.nextFigureScreen.reset();
@@ -286,7 +286,7 @@ export class Tetris {
         }
         if (this.currentFigure.canMove({ y: 1 })) {
           this.currentFigure.move({ y: 1 });
-          this.matrix.render(this.currentFigure);
+          this.gameScreen.render(this.currentFigure);
         }
         else {
           this.stackCurrentFigureOntoCanvas();
@@ -301,13 +301,13 @@ export class Tetris {
   stackCurrentFigureOntoCanvas = () => {
     console.log('Figure has been stacked', this.currentFigure);
     clearInterval(this.descendInterval);
-    this.matrix.stackFigureOntoCanvas(this.currentFigure);
-    this.matrix.clearFilledRows(numberOfRows => {
+    this.gameScreen.stackFigureOntoCanvas(this.currentFigure);
+    this.gameScreen.clearFilledRows(numberOfRows => {
       if (numberOfRows) {
         this.sound.rowCleared();
       }
     });
-    this.matrix.render();
+    this.gameScreen.render();
     this.spawnNewCurrentFigure();
     this.dropCurrentFigure();
   };
@@ -318,7 +318,7 @@ export class Tetris {
     }
     if (this.currentFigure.canRotate()) {
       this.currentFigure.rotate();
-      this.matrix.render(this.currentFigure);
+      this.gameScreen.render(this.currentFigure);
     }
     this.sound.figureRotated();
   };
@@ -339,9 +339,9 @@ export class Tetris {
 
 window.onload = () => {
   window.tetris = new Tetris({
-    matrixWidth: 10,
-    matrixHeight: 20,
-    matrixContainer: document.getElementById('matrix'),
-    nextFigureScreenContainer: document.getElementById('next-figure-screen'),
+    gameWidth: 10,
+    gameHeight: 20,
+    gameScreenContainer: document.querySelector('.screen-game'),
+    nextFigureScreenContainer: document.querySelector('.screen-next-figure'),
   });
 };

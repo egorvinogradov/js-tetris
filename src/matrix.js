@@ -1,21 +1,51 @@
 import { createArray, deepCloneArray } from './utils.js';
 
 export class Matrix {
+
+  BASE_CLASSNAME = 'screen-matrix';
+
   width = 0;
   height = 0;
-  container = null;
   canvas = [];
   canvasHash = '';
+
+  /**
+   * @type {HTMLElement}
+   */
+  container = null;
+
+  /**
+   * @type {HTMLElement}
+   */
+  canvasElement = null;
+
+  /**
+   * @type {HTMLElement}
+   */
+  backgroundElement = null;
 
   constructor(container, width, height){
     this.width = width;
     this.height = height;
     this.container = container;
     this.reset();
+    this.createDOM();
   };
 
-  createEmptyCanvas = () => {
-    const row = createArray(this.width, 0);
+  createDOM = () => {
+    this.canvasElement = document.createElement('div');
+    this.canvasElement.className = `${this.BASE_CLASSNAME} ${this.BASE_CLASSNAME}--main`;
+
+    this.backgroundElement = document.createElement('div');
+    this.backgroundElement.className = `${this.BASE_CLASSNAME} ${this.BASE_CLASSNAME}--background`;
+    this.backgroundElement.textContent = this.generateCanvasTextContent(this.createCanvas(1));
+
+    this.container.appendChild(this.canvasElement);
+    this.container.appendChild(this.backgroundElement);
+  };
+
+  createCanvas = (filler = 0) => {
+    const row = createArray(this.width, filler);
     return createArray(this.height, row);
   };
 
@@ -52,18 +82,15 @@ export class Matrix {
     if (figure) {
       canvas = this.createCanvasWithFigure(figure);
     }
-
     if (this.didCanvasChange(canvas)) {
-      const tableHtml = canvas.map(row => {
-        const rowHtml = row.map(cell => {
-          const attributes = cell ? ' class="filled"' : '';
-          return `<td${attributes}></td>`;
-        }).join('');
-        return `<tr>${rowHtml}</tr>`;
-      }).join('');
-
-      this.container.innerHTML= `<table>${tableHtml}</table>`;
+      this.canvasElement.textContent = this.generateCanvasTextContent(canvas);
     }
+  };
+
+  generateCanvasTextContent = (canvas) => {
+    return canvas.map(row => {
+      return row.map(cell => cell ? '#' : ' ').join('');
+    }).join('\n');
   };
 
   didCanvasChange = (currentCanvas) => {
@@ -76,7 +103,7 @@ export class Matrix {
   };
 
   reset = () => {
-    this.canvas = this.createEmptyCanvas();
+    this.canvas = this.createCanvas(0);
   };
 
   clearFilledRows = (callback) => {
