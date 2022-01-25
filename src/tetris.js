@@ -19,7 +19,8 @@ export class Tetris {
   SPEED_Y_MOVEMENT = 120;
   SPEED_Y_MOVEMENT_SPED_UP = 10;
 
-  KEYDOWN_SPEED_UP_DELAY = 150;
+  KEYDOWN_X_SPEED_UP_DELAY = 150;
+  KEYDOWN_Y_SPEED_UP_DELAY = 80;
 
   isOngoingGame = false;
   isPaused = false;
@@ -56,7 +57,8 @@ export class Tetris {
     } = config;
 
     this.gameScreen = new Matrix(gameScreenContainer, gameWidth, gameHeight);
-    this.gameScreen.render();
+    this.gameScreen.launchScreenSaver();
+
     this.nextFigureScreen = new Matrix(nextFigureScreenContainer, 4, 4);
     this.nextFigureScreen.render();
 
@@ -66,7 +68,6 @@ export class Tetris {
     this.scaleTetris();
     this.enableGeneralKeys();
     this.enableMovementKeys();
-    this.showScreenSaver();
 
     window.addEventListener('resize', this.scaleTetris);
     requestAnimationFrame(() => {
@@ -107,16 +108,18 @@ export class Tetris {
     addBodyClass(this.CLASSNAME_ONGOING_GAME);
     requestAnimationFrame(this.scaleTetris);
 
-    this.isOngoingGame = true;
+    setTimeout(() => {
+      this.isOngoingGame = true;
+      this.gameScreen.stopScreenSaver();
+      this.gameScreen.reset();
+      this.nextFigureScreen.reset();
 
-    this.gameScreen.reset();
-    this.nextFigureScreen.reset();
+      this.sound.startBackgroundNoise();
+      // this.sound.intro(); // TODO: fix
 
-    this.sound.startBackgroundNoise();
-    // this.sound.intro(); // TODO: fix
-
-    this.spawnNewCurrentFigure();
-    this.dropCurrentFigure();
+      this.spawnNewCurrentFigure();
+      this.dropCurrentFigure();
+    }, 1000);
   };
 
   pauseOrResumeGame = () => {
@@ -132,12 +135,13 @@ export class Tetris {
 
     this.isOngoingGame = false;
     this.isPaused = false;
+    clearInterval(this.descendInterval);
 
     this.gameScreen.reset();
     this.nextFigureScreen.reset();
 
     requestAnimationFrame(() => {
-      this.gameScreen.render();
+      this.gameScreen.launchScreenSaver();
       this.nextFigureScreen.render();
 
       removeBodyClass(this.CLASSNAME_PAUSED);
@@ -171,18 +175,24 @@ export class Tetris {
       'ArrowRight',
       'ArrowDown',
     ];
+
     document.addEventListener('keydown', e => {
       if (this.isPaused) {
         return;
       }
       const key = e.code;
+      const speedUpDelay = key === 'ArrowDown'
+        ? this.KEYDOWN_Y_SPEED_UP_DELAY
+        : this.KEYDOWN_X_SPEED_UP_DELAY;
+
       if (keys.includes(key) && !this.keyDownSpeedUpTimeouts[key]) {
         this.onMovementKeyEvent(key, 'start');
         this.keyDownSpeedUpTimeouts[key] = setTimeout(() => {
           this.onMovementKeyEvent(key, 'speedup');
-        }, this.KEYDOWN_SPEED_UP_DELAY);
+        }, speedUpDelay);
       }
     });
+
     document.addEventListener('keyup', e => {
       if (this.isPaused) {
         return;
@@ -323,16 +333,8 @@ export class Tetris {
     this.sound.figureRotated();
   };
 
-  showScreenSaver = () => {
-    console.error('__ SCREEN SAVER');
-  };
-
-  showGameOverScreen = () => {
-    console.error('__ GAME OVER');
-  };
-
   onGameFailed = () => {
-    this.showGameOverScreen();
+    console.error('__ GAME OVER');
     this.sound.gameOver();
   };
 }
