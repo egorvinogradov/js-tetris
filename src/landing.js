@@ -25,8 +25,8 @@ export class BrickGameLanding {
     this.animateLogo();
     this.scaleTetris();
 
-    this.renderScratches(document.querySelector('.scratches--curve'), 250, 100, 30);
-    this.renderScratches(document.querySelector('.scratches--bottom'), 250, 300, 100);
+    this.renderScratches(document.querySelector('.scratches--curve'), 30);
+    this.renderScratches(document.querySelector('.scratches--bottom'), 100);
 
     window.addEventListener('load', this.initializeTetris);
     window.addEventListener('resize', this.scaleTetris);
@@ -98,8 +98,11 @@ export class BrickGameLanding {
     }, interval);
   };
 
-  renderScratches = (container, scratchAreaWidth, scratchAreaHeight, scratchCount) => {
+  renderScratches = (container, scratchCount) => {
+    const scratchAreaWidth = container.clientWidth;
+    const scratchAreaHeight = container.clientHeight;
     const paths = [];
+
     for (let i = 0; i < scratchCount; i++) {
       paths.push(this.generateScratchPath(scratchAreaWidth, scratchAreaHeight));
     }
@@ -109,7 +112,7 @@ export class BrickGameLanding {
 
   generateScratchPath = (scratchAreaWidth, scratchAreaHeight) => {
     const pathWidth = random(10, scratchAreaWidth * 0.7);
-    const pathHeight = random(1, scratchAreaHeight * 0.05);
+    const pathHeight = random(1, scratchAreaHeight * 0.07);
     const x = random(0, scratchAreaWidth - pathWidth);
     const y = random(0, scratchAreaHeight - pathHeight);
     const angle = random(-10, 10);
@@ -145,7 +148,6 @@ export class BrickGameLanding {
     const dy = nextPoint[1] - previousPoint[1];
     const length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) * curveRadius;
     const angle = Math.atan2(dy, dx) + (isReverse ? Math.PI : 0);
-
     const x = currentPoint[0] + Math.cos(angle) * length;
     const y = currentPoint[1] + Math.sin(angle) * length;
     return [x, y];
