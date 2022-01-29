@@ -1,5 +1,5 @@
-export function random(limit){
-  return Math.round(Math.random() * limit);
+export function random(from, to){
+  return Math.round(Math.random() * (to - from)) + from;
 }
 
 export function createArray(size, filler){

@@ -1,17 +1,16 @@
 import { Matrix } from './matrix.js';
 import { Figure } from './figure.js';
 import { Sound } from './sound.js';
-import { addBodyClass, removeBodyClass, setCSSVariable } from './utils.js';
+
+export const TETRIS_EVENTS = {
+  NEW_GAME: 'NEW_GAME',
+  PLAY: 'PLAY',
+  PAUSE: 'PAUSE',
+  QUIT: 'QUIT',
+  FAIL: 'FAIL',
+};
 
 export class Tetris {
-
-  CLASSNAME_INITIALIZED = 'initialized';
-  CLASSNAME_ONGOING_GAME = 'ongoing-game';
-  CLASSNAME_PAUSED = 'paused';
-
-  TETRIS_ORIGINAL_HEIGHT = 601;
-  TETRIS_TO_WINDOW_HEIGHT_RATIO = 1.082;
-  TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME = 1.624;
 
   SPEED_DESCEND = 1000;
   SPEED_X_MOVEMENT = 100;
@@ -22,6 +21,9 @@ export class Tetris {
   KEYDOWN_X_SPEED_UP_DELAY = 150;
   KEYDOWN_Y_SPEED_UP_DELAY = 80;
 
+  NEW_GAME_DELAY = 600;
+
+  events = {};
   isOngoingGame = false;
   isPaused = false;
   descendInterval = null;
@@ -57,56 +59,32 @@ export class Tetris {
     } = config;
 
     this.gameScreen = new Matrix(gameScreenContainer, gameWidth, gameHeight);
-    this.gameScreen.launchScreenSaver();
+    // this.gameScreen.launchScreenSaver(); // TODO: uncomment
 
     this.nextFigureScreen = new Matrix(nextFigureScreenContainer, 4, 4);
     this.nextFigureScreen.render();
 
     this.sound = new Sound();
 
-    this.animateLogo();
-    this.scaleTetris();
     this.enableGeneralKeys();
     this.enableMovementKeys();
-
-    window.addEventListener('resize', this.scaleTetris);
-    requestAnimationFrame(() => {
-      addBodyClass(this.CLASSNAME_INITIALIZED);
-    });
   }
 
-  animateLogo = () => {
-    const logoElement = document.querySelector('.logo');
-    const interval = 5000;
-    let stage = 0;
-    setInterval(() => {
-      stage = stage > 2 ? 0 : stage + 1;
-      if (!stage) {
-        logoElement.className = 'logo';
-      }
-      else {
-        logoElement.classList.add('logo--frame-' + stage);
-      }
-    }, interval);
+  on = (eventName, callback) => {
+    if (!this.events[eventName]) {
+      this.events[eventName] = [];
+    }
+    this.events[eventName].push(callback);
   };
 
-  scaleTetris = () => {
-    const ratio = this.isOngoingGame
-      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME
-      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
-
-    const cssVariableName = this.isOngoingGame
-      ? '--position-tetris-ongoing-game-scale'
-      : '--position-tetris-scale';
-
-    const tetrisHeight = window.innerHeight * ratio;
-    const tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
-    setCSSVariable(cssVariableName, tetrisScale);
+  triggerEvent = (eventName, data) => {
+    if (this.events[eventName]?.length) {
+      this.events[eventName].map(callback => callback(data));
+    }
   };
 
   launchNewGame = () => {
-    addBodyClass(this.CLASSNAME_ONGOING_GAME);
-    requestAnimationFrame(this.scaleTetris);
+    this.triggerEvent(TETRIS_EVENTS.NEW_GAME);
 
     setTimeout(() => {
       this.isOngoingGame = true;
@@ -115,17 +93,17 @@ export class Tetris {
       this.nextFigureScreen.reset();
 
       this.sound.startBackgroundNoise();
-      // this.sound.intro(); // TODO: fix
+      // this.sound.intro(); // TODO: uncomment
 
       this.spawnNewCurrentFigure();
       this.dropCurrentFigure();
-    }, 1000);
+    }, this.NEW_GAME_DELAY);
   };
 
   pauseOrResumeGame = () => {
     if (this.isOngoingGame) {
       this.isPaused = !this.isPaused;
-      this.isPaused ? addBodyClass(this.CLASSNAME_PAUSED) : removeBodyClass(this.CLASSNAME_PAUSED);
+      this.triggerEvent(this.isPaused ? TETRIS_EVENTS.PAUSE : TETRIS_EVENTS.PLAY);
     }
   };
 
@@ -143,16 +121,11 @@ export class Tetris {
     requestAnimationFrame(() => {
       this.gameScreen.launchScreenSaver();
       this.nextFigureScreen.render();
-
-      removeBodyClass(this.CLASSNAME_PAUSED);
-      removeBodyClass(this.CLASSNAME_ONGOING_GAME);
-      requestAnimationFrame(this.scaleTetris);
+      this.triggerEvent(TETRIS_EVENTS.QUIT);
     });
   };
 
   enableGeneralKeys = () => {
-    document.querySelector('.menu-play').addEventListener('click', this.launchNewGame);
-    document.querySelector('.options-paused').addEventListener('click', this.pauseOrResumeGame);
     document.addEventListener('keydown', e => {
       const key = e.code;
       const actions = {
@@ -311,6 +284,7 @@ export class Tetris {
   stackCurrentFigureOntoCanvas = () => {
     console.log('Figure has been stacked', this.currentFigure);
     clearInterval(this.descendInterval);
+
     this.gameScreen.stackFigureOntoCanvas(this.currentFigure);
     this.gameScreen.clearFilledRows(numberOfRows => {
       if (numberOfRows) {
@@ -334,16 +308,7 @@ export class Tetris {
   };
 
   onGameFailed = () => {
-    console.error('__ GAME OVER');
     this.sound.gameOver();
+    this.triggerEvent(TETRIS_EVENTS.FAIL);
   };
 }
-
-window.onload = () => {
-  window.tetris = new Tetris({
-    gameWidth: 10,
-    gameHeight: 20,
-    gameScreenContainer: document.querySelector('.screen-game'),
-    nextFigureScreenContainer: document.querySelector('.screen-next-figure'),
-  });
-};

@@ -8,11 +8,12 @@
 </head>
 <body>
 
+
 <a class="logo" href="/">
   <div class="figure-type-o"><i></i><i></i><i></i><i></i></div>
 </a>
 
-<div class="options" hidden>
+<div class="options">
   <button class="options-sound">
     Sound
     <i class="options-sound-icon"></i>
@@ -70,8 +71,8 @@
         <div class="screen-caption screen-caption--speed">Speed</div>
         <div class="screen-caption screen-caption--level">Level</div>
         <div class="screen-counter screen-counter--score">0000000</div>
-        <div class="screen-counter screen-counter--speed">0</div>
-        <div class="screen-counter screen-counter--level">0</div>
+        <div class="screen-counter screen-counter--speed">1</div>
+        <div class="screen-counter screen-counter--level">1</div>
         <div class="screen-next-figure"></div>
       </div>
     </div>
@@ -128,6 +129,12 @@
   <div class="curve"></div>
   <div class="noise"></div>
 
+  <!-- SVG is generated in src/landing.js -->
+  <svg class="scratches scratches--curve" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <!-- SVG is generated in src/landing.js -->
+  <svg class="scratches scratches--bottom" xmlns="http://www.w3.org/2000/svg"></svg>
+
   <div class="brand">
     <div class="brand-logo">
       <div class="brand-logo-name">
@@ -151,10 +158,9 @@
 </svg>
 
 
-<script type="module" src="src/utils.js"></script>
-<script type="module" src="src/matrix.js"></script>
-<script type="module" src="src/figure_types.js"></script>
-<script type="module" src="src/figure.js"></script>
-<script type="module" src="src/tetris.js"></script>
+<script type="module">
+  import { BrickGameLanding } from './src/landing.js';
+  window.bg = new BrickGameLanding();
+</script>
 </body>
 </html>

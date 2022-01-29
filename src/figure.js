@@ -28,8 +28,8 @@ export class Figure {
 
   spawn = () => {
     const figureTypes = Object.keys(FIGURE_TYPES);
-    this.type = figureTypes[random(figureTypes.length - 1)];
-    this.typeIndex = random(FIGURE_TYPES[this.type].length - 1);
+    this.type = figureTypes[random(0, figureTypes.length - 1)];
+    this.typeIndex = random(0, FIGURE_TYPES[this.type].length - 1);
     this.pixels = FIGURE_TYPES[this.type][this.typeIndex];
     this.x = 0;
     this.y = 0;
@@ -37,7 +37,7 @@ export class Figure {
 
   setRandomXPosition = () => {
     const maxPosX = this.matrix.width - this.width;
-    this.x = random(maxPosX);
+    this.x = random(0, maxPosX);
   };
 
   setMatrix = (newMatrix) => {

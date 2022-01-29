@@ -1,7 +1,8 @@
 :root {
   --position-tetris-scale: 1.2;
   --position-tetris-translate-x: 50%;
-  --position-tetris-translate-y: -5.5%;
+  --position-tetris-translate-y: -5.75%;
+  --position-tetris-translate-rotation: 15deg;
 
   --position-tetris-ongoing-game-scale: 1.8;
   --position-tetris-ongoing-game-translate-x: 0;

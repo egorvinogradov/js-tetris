@@ -65,6 +65,35 @@
   pointer-events: none;
 }
 
+.scratches {
+  position: absolute;
+  pointer-events: none;
+}
+
+
+.scratches path {
+  stroke: #FFFFFF;
+  stroke-width: 0.5;
+  fill: none;
+  fill-rule: evenodd;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.scratches--bottom {
+  top: 320px;
+  width: 100%;
+  height: 265px;
+  opacity: 0.06;
+}
+
+.scratches--curve {
+  top: 217px;
+  width: 100%;
+  height: 100px;
+  opacity: 0.06;
+}
+
 
 
 /* SCREEN */
@@ -474,7 +503,6 @@
 
 .button {
   position: absolute;
-  z-index: 10;
 }
 
 .button:after {
@@ -495,6 +523,7 @@
   overflow: hidden;
   background: var(--tetris-color-button);
   border: 0;
+  z-index: 10;
   box-shadow:
     0 0 1px 2px rgba(11,11,11,.2),
     0 0 1px 1px rgba(0,0,0,.25),

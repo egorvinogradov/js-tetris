@@ -281,7 +281,7 @@ a:hover {
   margin-top: -300px;
   transform-origin: center;
   transform:
-    rotate(12deg)
+    rotate(var(--position-tetris-translate-rotation))
     scale(var(--position-tetris-scale))
     translateX(var(--position-tetris-translate-x))
     translateY(var(--position-tetris-translate-y));
