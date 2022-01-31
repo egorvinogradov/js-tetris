@@ -2,7 +2,7 @@
   --position-tetris-scale: 1.2;
   --position-tetris-translate-x: 50%;
   --position-tetris-translate-y: -5.75%;
-  --position-tetris-translate-rotation: 15deg;
+  --position-tetris-translate-rotation: 12deg;
 
   --position-tetris-ongoing-game-scale: 1.8;
   --position-tetris-ongoing-game-translate-x: 0;
@@ -23,8 +23,7 @@
   --tetris-color-screen-empty: #BFC6AF;
 
   --tetris-color-paint-red: #E02530;
-  --tetris-color-paint-green: #00BE68;
-  --tetris-color-paint-green-dark: #009952;
+  --tetris-color-paint-green: #00a955;
 
   --tetris-font-family-text: 'Arial', sans-serif;
   --tetris-font-family-brand: 'Pump Light', 'Arial', sans-serif;

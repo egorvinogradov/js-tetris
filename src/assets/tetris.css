@@ -61,13 +61,13 @@
   right: 0;
   z-index: 2;
   opacity: 0.35;
-  filter: url(#tetris-case-noise) grayscale(100%) contrast(6);
+  filter: grayscale(100%) contrast(6);
   pointer-events: none;
 }
 
 
 
-/* SCRATCHES & CRACKS */
+/* SCRATCHES, CRACKS & SCUFFS */
 
 .scratches {
   position: absolute;
@@ -151,7 +151,6 @@
   top: 20px;
   width: 12px;
   height: 10px;
-
   opacity: .3;
 }
 
@@ -173,7 +172,6 @@
   top: 68px;
   width: 16px;
   height: 10px;
-
   opacity: .3;
 }
 
@@ -185,14 +183,74 @@
   height: 7px;
 }
 
-.cracks i:nth-child(8):after {
-  display: none;
+.scuffs {
+  position: absolute;
+  top: 360px;
+  left: 34px;
+  pointer-events: none;
+}
 
-  clip-path: polygon(0% 78%, 39% 15%, 51% 17%, 66% 1%, 90% 98%, 94% 98%, 100% 63%, 92% 83%, 75% 43%, 67% 12%, 51% 43%, 44% 28%);
-  left: 26px;
-  top: 12px;
-  width: 31px;
-  height: 13px;
+.scuffs i {
+  position: absolute;
+  background: var(--tetris-color-case);
+  width: 24px;
+  height: 12px;
+  filter: blur(2px);
+  opacity: 0.81;
+}
+
+.scuffs i:nth-child(1) {
+  left: 7px;
+  top: 69px;
+}
+
+.scuffs i:nth-child(2) {
+  left: 9px;
+  top: 59px;
+  opacity: 0.95;
+}
+
+.scuffs i:nth-child(3) {
+  left: 32px;
+  top: 96px;
+  height: 7px;
+  filter: blur(1px);
+}
+
+.scuffs i:nth-child(4) {
+  left: 32px;
+  top: 86px;
+  opacity: 1;
+}
+
+.scuffs i:nth-child(5) {
+  left: 49px;
+  top: 72px;
+  height: 7px;
+  filter: blur(1px);
+}
+
+.scuffs i:nth-child(6) {
+  left: 49px;
+  top: 62px;
+  opacity: 1;
+}
+
+.scuffs i:nth-child(7) {
+  left: 164px;
+  top: 81px;
+  height: 7px;
+  opacity: 0.53;
+  filter: blur(1px);
+}
+
+.scuffs i:nth-child(8) {
+  top: 172px;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  filter: blur(3px);
+  opacity: 0.97;
 }
 
 
@@ -360,15 +418,17 @@
 
 /* DECORATIVE FIGURES */
 
-.figure-left {
+.figure-left,
+.figure-right {
   position: absolute;
   top: 27px;
+}
+
+.figure-left {
   left: 25px;
 }
 
 .figure-right {
-  position: absolute;
-  top: 27px;
   left: 209px;
 }
 
@@ -529,21 +589,22 @@
 
 .brand {
   position: absolute;
-  bottom: 39px;
+  bottom: 29px;
   left: 27px;
   width: 206px;
+  z-index: -1;
 }
 
 .brand-logo {
   position: absolute;
-  left: 63px;
+  left: 26px;
   bottom: 15px;
   transform: rotate(-33deg);
   width: min-content;
 }
 
 .brand-logo-name {
-  font: 39px/33px var(--tetris-font-family-brand);
+  font: 38px/33px var(--tetris-font-family-brand);
   letter-spacing: -0.04em;
   margin-left: 30px;
 }
@@ -565,12 +626,98 @@
   margin-left: -45px;
 }
 
-.brand-caption {
+.brand-logo-caption {
   font: bold 15px/15px var(--tetris-font-family-text);
   letter-spacing: 0;
   text-align: right;
   margin: 1px -1px 0 0;
   text-transform: none;
+}
+
+.brand-image {
+  position: absolute;
+  bottom: 34px;
+  right: 8px;
+  opacity: .8;
+  transform: scale(0.9);
+}
+
+.brand-image-head {
+  border-radius: 100%;
+  width: 33px;
+  height: 33px;
+  background: var(--tetris-color-paint-red);
+  position: relative;
+  display: block;
+}
+
+.brand-image-face {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  width: 21px;
+  height: 17px;
+  border-radius: 14px / 10px;
+  box-shadow: 0 0.15em 0 0 var(--tetris-color-case);
+}
+
+.brand-image-face:before,
+.brand-image-face:after {
+  content: '';
+  width: 3px;
+  height: 3px;
+  border-radius: 100%;
+  background: var(--tetris-color-case);
+  position: absolute;
+  top: 3px;
+}
+
+.brand-image-face:before {
+  left: 6px;
+}
+
+.brand-image-face:after {
+  right: 6px;
+}
+
+.brand-image-hand,
+.brand-image-hand:after {
+  position: absolute;
+  top: 21px;
+  filter: drop-shadow(1px -1px 0px var(--tetris-color-case));
+}
+
+.brand-image-hand:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 21px;
+  height: 18px;
+  background: var(--tetris-color-paint-red);
+  clip-path: polygon(7% 55%, 0% 35%, 0% 32%, 1% 29%, 3% 28%, 6% 29%, 8% 34%, 16% 51%, 20% 56%, 20% 54%, 14% 24%, 13% 17%, 14% 13%, 16% 11%, 18% 11%, 20% 13%, 22% 18%, 30% 44%, 33% 51%, 34% 51%, 33% 42%, 29% 14%, 29% 3%, 30% 1%, 32% -13%, 34% -13%, 35% 1%, 37% 4%, 39% 14%, 43% 36%, 46% 48%, 47% 49%, 47% 44%, 46% 25%, 47% 15%, 50% 8%, 52% 7%, 54% 7%, 55% 8%, 56% 12%, 58% 41%, 61% 59%, 64% 64%, 68% 69%, 72% 72%, 77% 72%, 87% 71%, 92% 72%, 98% 74%, 100% 78%, 99% 79%, 91% 82%, 79% 85%, 67% 93%, 54% 98%, 41% 100%, 34% 98%, 28% 93%, 21% 83%);
+}
+
+.brand-image-hand--left {
+  left: -9px;
+}
+
+.brand-image-hand--right {
+  left: 42px;
+  transform: scaleX(-1);
+}
+
+.brand-image-caption {
+  position: absolute;
+  top: 36px;
+  left: -2px;
+  color: var(--tetris-color-paint-red);
+  font: 14px/14px 'Adobe Kaiti Std';
+  letter-spacing: -0.2em;
+  text-shadow:
+    0 -1px 0 var(--tetris-color-case),
+    1px -1px 0 var(--tetris-color-case),
+    -1px -1px 0 var(--tetris-color-case);
 }
 
 .brand-model {
@@ -583,19 +730,19 @@
 
 .brand-stripe-1 {
   position: absolute;
-  bottom: 0;
+  bottom: 1px;
   width: 126px;
-  height: 5px;
-  background: var(--tetris-color-paint-green-dark);
+  height: 3px;
+  background: var(--tetris-color-paint-green);
 }
 
 .brand-stripe-2 {
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 1px;
   width: 26px;
-  height: 5px;
-  background: var(--tetris-color-paint-green-dark);
+  height: 3px;
+  background: var(--tetris-color-paint-green);
 }
 
 
@@ -672,21 +819,12 @@
   font-weight: bold;
   letter-spacing: 0.03em;
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 9px);
 }
 
 .button-caption--secondary {
-  top: calc(100% + 16px);
-}
-
-.button-caption--secondary:before {
-  content: '';
-  position: absolute;
-  height: 1px;
-  left: 22%;
-  right: 23%;
-  top: -2px;
-  background: white;
+  top: calc(100% + 18px);
+  color: var(--tetris-color-paint-green);
 }
 
 .button--large .button-knob {

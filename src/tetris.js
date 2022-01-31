@@ -59,7 +59,7 @@ export class Tetris {
     } = config;
 
     this.gameScreen = new Matrix(gameScreenContainer, gameWidth, gameHeight);
-    // this.gameScreen.launchScreenSaver(); // TODO: uncomment
+    this.gameScreen.launchScreenSaver();
 
     this.nextFigureScreen = new Matrix(nextFigureScreenContainer, 4, 4);
     this.nextFigureScreen.render();

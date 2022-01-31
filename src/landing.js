@@ -1,5 +1,5 @@
 import { Tetris, TETRIS_EVENTS } from './tetris.js';
-import { addBodyClass, random, removeBodyClass, setCSSVariable } from './utils.js';
+import { addBodyClass, applySVGFilter, random, removeBodyClass, setCSSVariable } from './utils.js';
 
 export class BrickGameLanding {
 
@@ -40,6 +40,22 @@ export class BrickGameLanding {
       nextFigureScreenContainer: document.querySelector(this.TETRIS_NEXT_FIGURE_SCREEN_SELECTOR),
     });
 
+    addBodyClass(this.CLASSNAME_INITIALIZED);
+    document.querySelector('.menu-play').addEventListener('click', this.tetris.launchNewGame);
+    document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
+
+    applySVGFilter(document.querySelector('.noise'), [
+      { type: 'turbulence', baseFrequency: 0.7, result: 'noise' }
+    ]);
+    applySVGFilter(document.querySelector('.brand-image'), [
+      { type: 'composite', inSource: true, in2Source: true, operator: 'in', result: 'composite' },
+      { type: 'turbulence', baseFrequency: 3, result: 'turbulence' },
+      { type: 'displacementMap', in: 'composite', in2: 'turbulence', scale: 1 },
+    ]);
+    this.initializeTetrisEvents();
+  };
+
+  initializeTetrisEvents = () => {
     this.tetris.on(TETRIS_EVENTS.NEW_GAME, () => {
       addBodyClass(this.CLASSNAME_ONGOING_GAME);
       requestAnimationFrame(this.scaleTetris);
@@ -60,13 +76,8 @@ export class BrickGameLanding {
     });
 
     this.tetris.on(TETRIS_EVENTS.FAIL, () => {
-      console.error('__ GAME OVER');
-      // TODO: fix
+      console.error('__ GAME OVER'); // TODO: fix
     });
-
-    addBodyClass(this.CLASSNAME_INITIALIZED);
-    document.querySelector('.menu-play').addEventListener('click', this.tetris.launchNewGame);
-    document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
   };
 
   scaleTetris = () => {
