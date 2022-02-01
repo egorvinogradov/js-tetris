@@ -23,6 +23,10 @@ export class Tetris {
 
   NEW_GAME_DELAY = 600;
 
+  level = 1;
+  score = 0;
+  rowsCleared = 0;
+
   events = {};
   isOngoingGame = false;
   isPaused = false;
@@ -132,7 +136,6 @@ export class Tetris {
         'Enter': () => this.launchNewGame(),
         'KeyP': () => this.pauseOrResumeGame(),
         'Escape': () => this.quitGame(),
-        'Space': () => this.rotateCurrentFigure(),
         'ArrowUp': () => this.rotateCurrentFigure(),
       };
       const action = actions[key];
@@ -282,12 +285,14 @@ export class Tetris {
   };
 
   stackCurrentFigureOntoCanvas = () => {
-    console.log('Figure has been stacked', this.currentFigure);
     clearInterval(this.descendInterval);
 
     this.gameScreen.stackFigureOntoCanvas(this.currentFigure);
+    this.changeScore({ type: 'stackFigure' });
+
     this.gameScreen.clearFilledRows(numberOfRows => {
       if (numberOfRows) {
+        this.changeScore({ type: 'rowCleared', numberOfRows });
         this.sound.rowCleared();
       }
     });
@@ -305,6 +310,28 @@ export class Tetris {
       this.gameScreen.render(this.currentFigure);
     }
     this.sound.figureRotated();
+  };
+
+  changeScore = (data) => {
+    const { type, numberOfRows } = data;
+    if (type === 'stackFigure') {
+      this.score += 10 * this.level;
+    }
+    if (type === 'rowCleared') {
+      const basePoints = numberOfRows === 1
+        ? 50
+        : numberOfRows === 2
+          ? 100
+          : numberOfRows === 3
+            ? 300
+            : 1200;
+      this.score += basePoints * this.level;
+      this.rowsCleared += numberOfRows;
+      this.level = Math.floor(this.rowsCleared / 10) + 1;
+    }
+    const displayedScore = Math.max(this.score, 9999999).toString().padStart(7, '0');
+    document.querySelector('.screen-counter--score').innerText = displayedScore;
+    document.querySelector('.screen-counter--level').innerText = this.level;
   };
 
   onGameFailed = () => {

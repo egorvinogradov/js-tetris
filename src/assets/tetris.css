@@ -151,7 +151,7 @@
   top: 20px;
   width: 12px;
   height: 10px;
-  opacity: .3;
+  opacity: 0.3;
 }
 
 .cracks i:nth-child(5):after {
@@ -172,7 +172,7 @@
   top: 68px;
   width: 16px;
   height: 10px;
-  opacity: .3;
+  opacity: 0.3;
 }
 
 .cracks i:nth-child(7):after {
@@ -245,8 +245,8 @@
 }
 
 .scuffs i:nth-child(8) {
-  top: 172px;
-  left: 0;
+  top: 128px;
+  left: 137px;
   width: 22px;
   height: 22px;
   filter: blur(3px);
@@ -324,7 +324,7 @@
   position: relative;
   top: -1px;
   pointer-events: none;
-  opacity: .12;
+  opacity: 0.12;
 }
 
 .screen-caption,
@@ -334,7 +334,7 @@
   letter-spacing: 0;
   text-shadow: 0.05em 0.09em 0.03em rgba(0,0,0,0.1);
   color: var(--tetris-color-screen-filled);
-  opacity: .85;
+  opacity: 0.85;
 }
 
 .screen-caption {
@@ -597,16 +597,16 @@
 
 .brand-logo {
   position: absolute;
-  left: 26px;
-  bottom: 15px;
-  transform: rotate(-33deg);
+  left: 49px;
+  bottom: 19px;
+  transform: rotate(-36deg);
   width: min-content;
+  opacity: 0.9;
 }
 
 .brand-logo-name {
-  font: 38px/33px var(--tetris-font-family-brand);
+  font: 35px/30px var(--tetris-font-family-brand);
   letter-spacing: -0.04em;
-  margin-left: 30px;
 }
 
 .brand-logo-name:first-line {
@@ -623,22 +623,27 @@
 
 .brand-logo-name:before {
   content: '';
-  margin-left: -45px;
+  margin-left: -40px;
 }
 
 .brand-logo-caption {
-  font: bold 15px/15px var(--tetris-font-family-text);
-  letter-spacing: 0;
+  font: normal 18px/18px var(--tetris-font-family-brand);
+  letter-spacing: 0.03em;
   text-align: right;
-  margin: 1px -1px 0 0;
-  text-transform: none;
+  margin: 2px -32px 0 0;
+  word-spacing: -0.05em;
+}
+
+.brand-logo-caption--in {
+  font-family: var(--tetris-font-family-text);
+  font-size: 16px;
 }
 
 .brand-image {
   position: absolute;
-  bottom: 34px;
+  bottom: 30px;
   right: 8px;
-  opacity: .8;
+  opacity: 0.8;
   transform: scale(0.9);
 }
 
@@ -723,26 +728,26 @@
 .brand-model {
   position: absolute;
   left: 132px;
-  bottom: -4px;
+  bottom: -2px;
   font: bold 13px/13px var(--tetris-font-family-text);
   letter-spacing: 0;
 }
 
-.brand-stripe-1 {
+.brand-stripe-1,
+.brand-stripe-2 {
   position: absolute;
-  bottom: 1px;
-  width: 126px;
+  bottom: 3px;
   height: 3px;
   background: var(--tetris-color-paint-green);
 }
 
+.brand-stripe-1 {
+  width: 126px;
+}
+
 .brand-stripe-2 {
-  position: absolute;
   right: 0;
-  bottom: 1px;
   width: 26px;
-  height: 3px;
-  background: var(--tetris-color-paint-green);
 }
 
 

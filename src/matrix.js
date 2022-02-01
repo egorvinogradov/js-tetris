@@ -168,7 +168,7 @@ export class Matrix {
   launchScreenSaver = async () => {
     const emptyCanvas = this.createCanvas(0);
     const screensaverCanvas = deepCloneArray(this.SCREENSAVER_CANVAS);
-    const spiralRepaintFunctions = {
+    const repaintFunctions = {
       fade: (canvas, rowIndex, columnIndex) => {
         canvas[rowIndex][columnIndex] = 1;
         return canvas;
@@ -183,10 +183,8 @@ export class Matrix {
 
     await this.renderScreensaverFrame(screensaverCanvas, this.SCREENSAVER_STEP_DELAY);
     await this.renderScreensaverFrame(screensaverCanvas, this.SCREENSAVER_LOAD_DELAY);
-
-    await this.screensaverSpiralTraverse(screensaverCanvas, spiralRepaintFunctions.fade);
-    await this.screensaverSpiralTraverse(screensaverCanvas, spiralRepaintFunctions.screenSaver);
-
+    await this.screensaverSpiralTraverse(screensaverCanvas, repaintFunctions.fade);
+    await this.screensaverSpiralTraverse(screensaverCanvas, repaintFunctions.screenSaver);
     await this.renderScreensaverFrame(emptyCanvas, this.SCREENSAVER_STEP_DELAY);
     await this.renderScreensaverFrame(screensaverCanvas, this.SCREENSAVER_STEP_DELAY);
     await this.renderScreensaverFrame(emptyCanvas, this.SCREENSAVER_STEP_DELAY);
