@@ -12,6 +12,7 @@ export class BrickGameLanding {
   CLASSNAME_INITIALIZED = 'initialized';
   CLASSNAME_ONGOING_GAME = 'ongoing-game';
   CLASSNAME_PAUSED = 'paused';
+  CLASSNAME_GAME_OVER = 'game-over';
 
   TETRIS_WIDTH_POINTS = 10;
   TETRIS_HEIGHT_POINTS = 20;
@@ -55,26 +56,23 @@ export class BrickGameLanding {
     });
 
     this.tetris.on(TETRIS_EVENTS.NEW_GAME, () => {
+      removeBodyClass(this.CLASSNAME_PAUSED);
+      removeBodyClass(this.CLASSNAME_GAME_OVER);
       addBodyClass(this.CLASSNAME_ONGOING_GAME);
-      requestAnimationFrame(this.scaleTetris);
     });
-
     this.tetris.on(TETRIS_EVENTS.QUIT, () => {
       removeBodyClass(this.CLASSNAME_PAUSED);
+      removeBodyClass(this.CLASSNAME_GAME_OVER);
       removeBodyClass(this.CLASSNAME_ONGOING_GAME);
-      requestAnimationFrame(this.scaleTetris);
     });
-
     this.tetris.on(TETRIS_EVENTS.PLAY, () => {
-      addBodyClass(this.CLASSNAME_ONGOING_GAME);
+      removeBodyClass(this.CLASSNAME_PAUSED);
     });
-
     this.tetris.on(TETRIS_EVENTS.PAUSE, () => {
-      removeBodyClass(this.CLASSNAME_ONGOING_GAME);
+      addBodyClass(this.CLASSNAME_PAUSED);
     });
-
     this.tetris.on(TETRIS_EVENTS.FAIL, () => {
-      console.error('__ GAME OVER'); // TODO: fix
+      addBodyClass(this.CLASSNAME_GAME_OVER);
     });
 
     addBodyClass(this.CLASSNAME_INITIALIZED);
@@ -83,17 +81,13 @@ export class BrickGameLanding {
   };
 
   scaleTetris = () => {
-    const ratio = this.tetris?.isOngoingGame
-      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME
-      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
-
-    const cssVariableName = this.tetris?.isOngoingGame
-      ? '--position-tetris-ongoing-game-scale'
-      : '--position-tetris-scale';
-
-    const tetrisHeight = window.innerHeight * ratio;
+    const tetrisHeight = window.innerHeight * this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
     const tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
-    setCSSVariable(cssVariableName, tetrisScale);
+    setCSSVariable('--position-tetris-scale', tetrisScale);
+
+    const tetrisHeightOngoingGame = window.innerHeight * this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME;
+    const tetrisScaleOngoingGame = tetrisHeightOngoingGame / this.TETRIS_ORIGINAL_HEIGHT;
+    setCSSVariable('--position-tetris-ongoing-game-scale', tetrisScaleOngoingGame);
   };
 
   animateLogo = () => {

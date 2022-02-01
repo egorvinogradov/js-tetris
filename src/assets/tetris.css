@@ -410,7 +410,7 @@
 
 .screen-caption--lines,
 .muted .screen-caption--sound,
-.ongoing-game .screen-caption--game-over {
+.ongoing-game:not(.game-over) .screen-caption--game-over {
   opacity: 0.2;
 }
 

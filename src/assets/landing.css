@@ -321,4 +321,5 @@ a:hover {
 
 .initialized .landing-tetris {
   transition: opacity 300ms, transform 800ms;
+  will-change: transform, opacity;
 }

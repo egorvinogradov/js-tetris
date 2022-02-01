@@ -60,6 +60,8 @@ export class Sound {
   };
 
   startBackgroundNoise = () => {
+    return; // TODO: remove
+
     if (this.backgroundPlayback) {
       this.backgroundPlayback.play();
     }
@@ -78,6 +80,8 @@ export class Sound {
   };
 
   stopBackgroundNoise = () => {
+    return; // TODO: remove
+
     if (this.backgroundPlayback) {
       this.backgroundPlayback.pause();
       this.backgroundPlayback.currentTime = 0;
@@ -85,6 +89,8 @@ export class Sound {
   };
 
   play = (audioUrl) => {
+    return; // TODO: remove
+
     const audio = new Audio(audioUrl);
     if (!this.isMute && !this.isPlayingIntro) {
       audio.volume = 0.4;
@@ -94,6 +100,8 @@ export class Sound {
   };
 
   intro = () => {
+    return; // TODO: remove
+
     const audio = this.play(this.INTRO);
 
     if (!audio.paused) {
@@ -105,8 +113,7 @@ export class Sound {
   };
 
   rowCleared = () => {
-    // TODO: fix
-    // this.play(this.ROW_CLEARED);
+    this.play(this.ROW_CLEARED);
   };
 
   gameOver = () => {
@@ -118,6 +125,8 @@ export class Sound {
   };
 
   figureMoved = () => {
+    return; // TODO: remove
+
     if (this.movementPlayback) {
       this.movementPlayback.pause();
       this.movementPlayback.currentTime = 0;
