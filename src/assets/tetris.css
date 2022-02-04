@@ -201,44 +201,44 @@
 
 .scuffs i:nth-child(1) {
   left: 7px;
-  top: 69px;
+  top: 63px;
 }
 
 .scuffs i:nth-child(2) {
   left: 9px;
-  top: 59px;
+  top: 53px;
   opacity: 0.95;
 }
 
 .scuffs i:nth-child(3) {
   left: 32px;
-  top: 96px;
+  top: 90px;
   height: 7px;
   filter: blur(1px);
 }
 
 .scuffs i:nth-child(4) {
   left: 32px;
-  top: 86px;
+  top: 80px;
   opacity: 1;
 }
 
 .scuffs i:nth-child(5) {
   left: 49px;
-  top: 72px;
+  top: 66px;
   height: 7px;
   filter: blur(1px);
 }
 
 .scuffs i:nth-child(6) {
   left: 49px;
-  top: 62px;
+  top: 56px;
   opacity: 1;
 }
 
 .scuffs i:nth-child(7) {
   left: 164px;
-  top: 81px;
+  top: 75px;
   height: 7px;
   opacity: 0.53;
   filter: blur(1px);
@@ -717,7 +717,7 @@
   top: 36px;
   left: -2px;
   color: var(--tetris-color-paint-red);
-  font: 14px/14px 'Adobe Kaiti Std';
+  font: 14px/14px 'STKaiti', 'SimKai', 'KaiTi', cursive;
   letter-spacing: -0.2em;
   text-shadow:
     0 -1px 0 var(--tetris-color-case),
@@ -872,36 +872,39 @@
 }
 
 .button-rotate {
-  top: 383px;
+  top: 377px;
   right: 31px;
 }
 
 .button-left {
-  top: 388px;
+  top: 382px;
   left: 33px;
 }
 
 .button-right {
-  top: 388px;
+  top: 382px;
   left: 91px;
 }
 
 .button-down {
-  top: 416px;
+  top: 410px;
   left: 62px;
 }
 
+.button-top-pause,
+.button-top-quit,
+.button-top-mute {
+  top: 331px;
+}
+
 .button-top-pause {
-  top: 337px;
   left: 72px;
 }
 
 .button-top-quit {
-  top: 337px;
   left: 121px;
 }
 
 .button-top-mute {
-  top: 337px;
   left: 170px;
 }
