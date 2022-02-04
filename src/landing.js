@@ -33,7 +33,7 @@ export class BrickGameLanding {
     this.scaleTetris();
 
     applySVGFilter(document.querySelector('.noise'), [
-      { type: 'turbulence', baseFrequency: 0.7 }
+      { type: 'turbulence', baseFrequency: 1 }
     ]);
     applySVGFilter(document.querySelector('.brand-image'), [
       { type: 'composite', operator: 'in', result: 'composite', inSource: true, in2Source: true },

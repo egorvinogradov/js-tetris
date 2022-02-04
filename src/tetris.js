@@ -81,6 +81,9 @@ export class Tetris {
 
     this.enableGeneralKeys();
     this.enableMovementKeys();
+    this.enableMovementButton('.button-left');
+    this.enableMovementButton('.button-right');
+    this.enableMovementButton('.button-down');
   }
 
   on = (eventName, callback) => {
@@ -149,10 +152,11 @@ export class Tetris {
 
   enableGeneralKeys = () => {
     const actions = {
-      'Enter': () => this.launchNewGame(),
-      'KeyP': () => this.pauseOrResumeGame(),
-      'Escape': () => this.quitGame(),
-      'ArrowUp': () => this.rotateCurrentFigure(),
+      'Enter': this.launchNewGame,
+      'Escape': this.quitGame,
+      'ArrowUp': this.rotateCurrentFigure,
+      'KeyP': this.pauseOrResumeGame,
+      'KeyM': this.sound.toggleMute,
     };
     document.addEventListener('keydown', e => {
       const key = e.code;
@@ -161,6 +165,10 @@ export class Tetris {
         action();
       }
     });
+    document.querySelector('.button-rotate .button-knob').addEventListener('click', actions.ArrowUp);
+    document.querySelector('.button-top-pause .button-knob').addEventListener('click', actions.KeyP);
+    document.querySelector('.button-top-quit .button-knob').addEventListener('click', actions.Escape);
+    document.querySelector('.button-top-mute .button-knob').addEventListener('click', actions.KeyM);
   };
 
   enableMovementKeys = () => {
@@ -169,39 +177,56 @@ export class Tetris {
       'ArrowRight',
       'ArrowDown',
     ];
-
     document.addEventListener('keydown', e => {
-      if (!this.canPlay()) {
-        return;
-      }
-      const key = e.code;
-      const speedUpDelay = key === 'ArrowDown'
-        ? this.KEYDOWN_Y_SPEED_UP_DELAY
-        : this.KEYDOWN_X_SPEED_UP_DELAY;
-
-      if (keys.includes(key) && !this.keyDownSpeedUpTimeouts[key]) {
-        this.onMovementKeyEvent(key, 'start');
-        this.keyDownSpeedUpTimeouts[key] = setTimeout(() => {
-          this.onMovementKeyEvent(key, 'speedup');
-        }, speedUpDelay);
+      if (keys.includes(e.code)) {
+        this.onMovementStart(e.code);
       }
     });
-
     document.addEventListener('keyup', e => {
-      if (!this.canPlay()) {
-        return;
-      }
-      const key = e.code;
-
-      if (keys.includes(key)) {
-        clearTimeout(this.keyDownSpeedUpTimeouts[key]);
-        delete this.keyDownSpeedUpTimeouts[key];
-        this.onMovementKeyEvent(key, 'stop');
+      if (keys.includes(e.code)) {
+        this.onMovementCancel(e.code);
       }
     });
   };
 
-  onMovementKeyEvent = (key, stage) => {
+  enableMovementButton = (selector) => {
+    const element = document.querySelector(selector);
+    const keyCode = element.dataset.key;
+    element.querySelector('.button-knob').addEventListener('mousedown', () => {
+      this.onMovementStart(keyCode);
+    });
+    element.querySelector('.button-knob').addEventListener('mouseup', () => {
+      this.onMovementCancel(keyCode);
+    });
+  };
+
+  onMovementStart = (key) => {
+    if (!this.canPlay()) {
+      return;
+    }
+    const speedUpDelay = key === 'ArrowDown'
+      ? this.KEYDOWN_Y_SPEED_UP_DELAY
+      : this.KEYDOWN_X_SPEED_UP_DELAY;
+
+    if (!this.keyDownSpeedUpTimeouts[key]) {
+      this.onMovementStageChange(key, 'start');
+      this.keyDownSpeedUpTimeouts[key] = setTimeout(() => {
+        this.onMovementStageChange(key, 'speedup');
+      }, speedUpDelay);
+    }
+  };
+
+  onMovementCancel = (key) => {
+    if (!this.canPlay()) {
+      return;
+    }
+
+    clearTimeout(this.keyDownSpeedUpTimeouts[key]);
+    delete this.keyDownSpeedUpTimeouts[key];
+    this.onMovementStageChange(key, 'stop');
+  };
+
+  onMovementStageChange = (key, stage) => {
     if (stage === 'start') {
       const delta = this.getMovementDelta(key);
       const speed = this.getMovementSpeed(key, stage);

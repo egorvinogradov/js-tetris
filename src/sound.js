@@ -26,20 +26,10 @@ export class Sound {
 
   constructor(){
     this.isMute = JSON.parse(localStorage['mute'] || false);
-    this.enableMuteSwitcher();
     if (this.isMute) {
       addBodyClass(this.CLASSNAME_MUTED);
     }
   }
-
-  enableMuteSwitcher = () => {
-    document.querySelector('.options-sound').addEventListener('click', this.toggleMute);
-    document.addEventListener('keydown', e => {
-      if (e.code === 'KeyM') {
-        this.toggleMute();
-      }
-    });
-  };
 
   toggleMute = () => {
     this.setMuteState(!this.isMute);
