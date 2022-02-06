@@ -1,0 +1,24 @@
+{
+  "name": "Elixir",
+  "short_name": "Elixir",
+  "icons": [
+    {
+      "src": "./assets/images/icon-manifest-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "./assets/images/icon-manifest-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable any"
+    }
+  ],
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait",
+  "theme_color": "#F1F3F4",
+  "background_color": "#0033FF"
+}

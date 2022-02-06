@@ -1,0 +1,29 @@
+{
+  "name": "js-tetris",
+  "version": "1.0.0",
+  "description": "",
+  "browserslist": [
+    "last 1 Chrome versions"
+  ],
+  "scripts": {
+    "dev": "parcel index.html --port 5000",
+    "build": "rm -rf dist && parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/egorvinogradov/js-tetris.git"
+  },
+  "author": "Egor Vinogradov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/egorvinogradov/js-tetris/issues"
+  },
+  "homepage": "https://github.com/egorvinogradov/js-tetris#readme",
+  "devDependencies": {
+    "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
+    "@babel/plugin-proposal-optional-chaining": "^7.16.7",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "parcel": "^2.2.1"
+  }
+}
