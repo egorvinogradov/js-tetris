@@ -16,6 +16,7 @@ body {
 body, button, kbd {
   color: var(--landing-color-text);
   font: var(--landing-font-size)/var(--landing-font-size) var(--landing-font-family);
+  line-height: 120%;
   letter-spacing: var(--landing-letter-spacing);
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
@@ -198,7 +199,7 @@ a:hover {
   font-size: 3.1vh !important;
   position: relative;
   cursor: pointer;
-  margin: 5vh 0;
+  margin: 4vh 0;
   padding: 0;
   transition: opacity 500ms;
   word-spacing: -1.1vh;
