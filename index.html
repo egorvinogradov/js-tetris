@@ -3,6 +3,29 @@
 <head>
   <meta charset="utf-8">
   <title>Tetris Brick Game E-1997</title>
+
+  <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1, viewport-fit=cover">
+  <link rel="manifest" href="./manifest.webmanifest"/>
+
+  <link rel="shortcut icon" type="image/x-icon" href="./src/assets/icons/favicon.ico"/>
+  <link rel="apple-touch-icon"  href="./src/assets/icons/icon-ios-192.png">
+  <link rel="icon" sizes="192x192" href="./src/assets/icons/icon-android-192.png">
+  <link rel="icon" sizes="512x512" href="./src/assets/icons/icon-android-512.png">
+
+  <!-- apple-touch-startup-image is updated dynamically in src/pwa.js -->
+  <link rel="apple-touch-startup-image" href="./src/assets/icons/icon-ios-splash-screen.png">
+
+  <meta name="application-name" content="Brick Game">
+  <meta name="apple-mobile-web-app-title" content="Brick Game">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#0033FF">
+  <meta name="theme-color" content="#F1F3F4">
+  <meta name="msapplication-TileColor" content="#0033FF">
+  <meta name="msapplication-TileImage" content="./src/assets/icons/icon-windows-144.png">
+  <meta name="msapplication-starturl" content="/">
+
   <link rel="stylesheet" href="src/assets/landing.css">
   <link rel="stylesheet" href="src/assets/tetris.css">
 </head>
@@ -19,6 +42,17 @@
     <i class="options-sound-icon"></i>
   </button>
   <div class="options-paused">Paused</div>
+  <div class="options-reset-pwa" hidden>&gt; Reset PWA</div>
+</div>
+
+<div class="installation" hidden>
+  Install app?
+  <div class="installation-install" hidden>&gt; Install</div>
+  <ul class="installation-options">
+    <li class="installation-options-item installation-options-item--yes">Yes, install</li>
+    <li class="installation-options-item installation-options-item--no">No</li>
+    <li class="installation-options-item installation-options-item--never" hidden>No, never ask me again</li>
+  </ul>
 </div>
 
 <div class="credits">

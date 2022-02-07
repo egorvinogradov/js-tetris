@@ -1,4 +1,5 @@
 import { Tetris, TETRIS_EVENTS } from './tetris.js';
+import { PWA } from './pwa.js';
 import {
   addBodyClass,
   removeBodyClass,
@@ -28,20 +29,20 @@ export class BrickGameLanding {
    */
   tetris = null;
 
+  /**
+   * @type {PWA}
+   */
+  pwa = null;
+
   constructor(){
     this.animateLogo();
     this.scaleTetris();
+    this.applyVisualEffects();
 
-    applySVGFilter(document.querySelector('.noise'), [
-      { type: 'turbulence', baseFrequency: 1 }
-    ]);
-    applySVGFilter(document.querySelector('.brand-image'), [
-      { type: 'composite', operator: 'in', result: 'composite', inSource: true, in2Source: true },
-      { type: 'turbulence', baseFrequency: 3, result: 'turbulence' },
-      { type: 'displacementMap', scale: 1, in: 'composite', in2: 'turbulence' },
-    ]);
-    this.renderScratches(document.querySelector('.scratches--curve'), 30);
-    this.renderScratches(document.querySelector('.scratches--bottom'), 100);
+    this.pwa = new PWA();
+
+    // TODO: move to settings, change appearance, optimize code
+    document.querySelector('.options-reset-pwa').addEventListener('click', this.pwa.reset);
 
     window.addEventListener('load', this.initializeTetris);
     window.addEventListener('resize', this.scaleTetris);
@@ -78,6 +79,19 @@ export class BrickGameLanding {
     addBodyClass(this.CLASSNAME_INITIALIZED);
     document.querySelector('.menu-play').addEventListener('click', this.tetris.launchNewGame);
     document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
+  };
+
+  applyVisualEffects = () => {
+    applySVGFilter(document.querySelector('.noise'), [
+      { type: 'turbulence', baseFrequency: 1 }
+    ]);
+    applySVGFilter(document.querySelector('.brand-image'), [
+      { type: 'composite', operator: 'in', result: 'composite', inSource: true, in2Source: true },
+      { type: 'turbulence', baseFrequency: 3, result: 'turbulence' },
+      { type: 'displacementMap', scale: 1, in: 'composite', in2: 'turbulence' },
+    ]);
+    this.renderScratches(document.querySelector('.scratches--curve'), 30);
+    this.renderScratches(document.querySelector('.scratches--bottom'), 100);
   };
 
   scaleTetris = () => {

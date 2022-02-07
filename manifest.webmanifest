@@ -1,15 +1,15 @@
 {
-  "name": "Elixir",
-  "short_name": "Elixir",
+  "name": "Tetris Brick Game E-1997",
+  "short_name": "Brick Game",
   "icons": [
     {
-      "src": "./assets/images/icon-manifest-192.png",
+      "src": "./src/assets/icons/icon-android-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "maskable any"
     },
     {
-      "src": "./assets/images/icon-manifest-512.png",
+      "src": "./src/assets/icons/icon-android-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable any"

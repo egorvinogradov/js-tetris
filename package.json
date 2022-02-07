@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "browserslist": [
-    "last 1 Chrome versions"
+    "since 2018"
   ],
   "scripts": {
-    "dev": "parcel index.html --port 5000",
-    "build": "rm -rf dist && parcel build index.html"
+    "dev": "./bin/dev.sh",
+    "build": "./bin/build.sh"
   },
   "repository": {
     "type": "git",
@@ -20,10 +20,14 @@
   },
   "homepage": "https://github.com/egorvinogradov/js-tetris#readme",
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
     "@babel/plugin-proposal-optional-chaining": "^7.16.7",
-    "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
-    "parcel": "^2.2.1"
+    "@parcel/packager-raw-url": "^2.2.1",
+    "@parcel/transformer-webmanifest": "^2.2.1",
+    "concurrently": "^7.0.0",
+    "parcel": "^2.2.1",
+    "lmdb": "2.1.7"
   }
 }

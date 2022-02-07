@@ -298,6 +298,56 @@ a:hover {
 
 
 
+/* PWA */
+
+.installation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  white-space: nowrap;
+  padding: 30px;
+  background: var(--landing-color-text);
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  color: var(--landing-color-background);
+}
+
+.installation-options {
+  padding: 0;
+  margin: 30px 0 0 0;
+  list-style: none;
+}
+
+.installation-options-item {
+  position: relative;
+  margin: 12px 0 0 15px;
+  width: min-content;
+  cursor: pointer;
+}
+
+.installation-options-item:hover {
+  box-shadow: 0 2px 0 var(--landing-color-background);
+}
+
+.installation-options-item:before {
+  content: '>';
+  position: absolute;
+  left: -15px;
+  top: 0;
+}
+
+.installation-dismiss {
+  border: 0;
+  background: none;
+  padding: 20px;
+  color: var(--landing-color-background);
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+
+
 /* SWITCHING STATES */
 
 .logo,
