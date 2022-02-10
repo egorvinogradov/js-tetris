@@ -1,12 +1,11 @@
 export class PWA {
 
-  SPLASH_SCREEN_BACKGROUND = '#0033FF';
+  IOS_SPLASH_SCREEN_BACKGROUND = '#0033FF';
 
   PROMPT_DISMISSAL_MAX_ATTEMPTS = 3;
   PROMPT_DISMISSAL_EXPIRATION_PERIOD = 5 * 24 * 60 * 60 * 100; // 5 days
 
   beforeInstallPrompt = null;
-  elements = {};
 
   constructor(){
     if (navigator.serviceWorker && !localStorage['debug']) {
@@ -14,24 +13,26 @@ export class PWA {
     }
     this.renderIOSSplashScreen();
     window.addEventListener('beforeinstallprompt', this.onReadyToInstall);
+    window.addEventListener('appinstalled', this.dismissPromptForever);
   }
 
   onReadyToInstall = (beforeInstallPrompt) => {
+    beforeInstallPrompt.preventDefault();
     this.beforeInstallPrompt = beforeInstallPrompt;
 
-    this.elements.prompt = document.querySelector('.installation');
-    this.elements.buttonYes = document.querySelector('.installation-options-item--yes');
-    this.elements.buttonNo = document.querySelector('.installation-options-item--no');
-    this.elements.buttonNever = document.querySelector('.installation-options-item--never');
+    this.promptElement = document.querySelector('.installation');
+    this.buttonYesElement = document.querySelector('.installation-options-item--yes');
+    this.buttonNoElement = document.querySelector('.installation-options-item--no');
+    this.buttonNeverElement = document.querySelector('.installation-options-item--never');
 
     if (this.canShowInstallationPrompt()) {
-      this.elements.prompt.hidden = false; // TODO: redesign appearance
-      this.elements.buttonYes.addEventListener('click', this.install);
-      this.elements.buttonNo.addEventListener('click', this.dismissPromptOnce);
+      this.promptElement.hidden = false; // TODO: redesign appearance
+      this.buttonYesElement.addEventListener('click', this.install);
+      this.buttonNoElement.addEventListener('click', this.dismissPromptOnce);
 
       if (this.getPromptDismissalAttempts() > 0) {
-        this.elements.buttonNever.hidden = false;
-        this.elements.buttonNever.addEventListener('click', this.dismissPromptForever);
+        this.buttonNeverElement.hidden = false;
+        this.buttonNeverElement.addEventListener('click', this.dismissPromptForever);
       }
     }
   };
@@ -43,15 +44,17 @@ export class PWA {
   dismissPromptOnce = () => {
     localStorage['prompt_dismissal_attempts'] = this.getPromptDismissalAttempts() + 1;
     localStorage['prompt_dismissal_date'] = +new Date();
-    this.elements.prompt.hidden = true; // TODO: redesign appearance
+    this.promptElement.hidden = true; // TODO: redesign appearance
   };
 
   dismissPromptForever = () => {
     localStorage['prompt_dismissal_attempts'] = this.PROMPT_DISMISSAL_MAX_ATTEMPTS;
-    this.elements.prompt.hidden = true; // TODO: redesign appearance
+    this.promptElement.hidden = true; // TODO: redesign appearance
   };
 
   canShowInstallationPrompt = () => {
+    // TODO: show after first play (and after some time has passed)
+
     if (this.getPromptDismissalAttempts() >= this.PROMPT_DISMISSAL_MAX_ATTEMPTS) {
       return false;
     }
@@ -63,15 +66,15 @@ export class PWA {
   install = () => {
     if (this.beforeInstallPrompt) {
       this.beforeInstallPrompt.prompt();
+      this.beforeInstallPrompt.userChoice.then(result => {
+        if (result.outcome === 'accepted') {
+          delete localStorage['prompt_dismissal_attempts'];
+          delete localStorage['prompt_dismissal_date'];
+          this.promptElement.hidden = true; // TODO: redesign appearance
+        }
+        this.beforeInstallPrompt = null;
+      });
     }
-
-    this.beforeInstallPrompt.userChoice.then(result => {
-      if (result.outcome === 'accepted') {
-        delete localStorage['prompt_dismissal_attempts'];
-        delete localStorage['prompt_dismissal_date'];
-        this.elements.prompt.hidden = true; // TODO: redesign appearance
-      }
-    });
   };
 
   registerServiceWorker = () => {
@@ -96,22 +99,17 @@ export class PWA {
     canvas.height = availHeight * devicePixelRatio;
 
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = this.SPLASH_SCREEN_BACKGROUND;
+    ctx.fillStyle = this.IOS_SPLASH_SCREEN_BACKGROUND;
     ctx.scale(devicePixelRatio, devicePixelRatio);
     ctx.fillRect(0, 0, availWidth, availHeight);
 
     const icon = new Image();
 
     icon.onload = () => {
-      let canvasIconWidth = availWidth * 0.4;
-      let canvasIconHeight = (icon.height / icon.width) * availWidth * 0.4;
-      if (availWidth > availHeight) {
-        canvasIconHeight = availHeight * 0.3;
-        canvasIconWidth = (icon.width / icon.height) * availHeight * 0.3;
-      }
-      let canvasIconX = (availWidth - canvasIconWidth) / 2;
-      let canvasIconY = (availHeight - canvasIconHeight) / 2;
-
+      const canvasIconWidth = availWidth * 0.2;
+      const canvasIconHeight = (icon.height / icon.width) * canvasIconWidth;
+      const canvasIconX = (availWidth - canvasIconWidth) / 2;
+      const canvasIconY = (availHeight - canvasIconHeight) / 2;
       ctx.drawImage(icon, canvasIconX, canvasIconY, canvasIconWidth, canvasIconHeight);
       linkElement.href = canvas.toDataURL('image/png');
     };

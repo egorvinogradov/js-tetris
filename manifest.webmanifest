@@ -15,10 +15,10 @@
       "purpose": "maskable any"
     }
   ],
-  "display": "standalone",
+  "display": "fullscreen",
   "scope": "/",
   "start_url": "/",
   "orientation": "portrait",
   "theme_color": "#F1F3F4",
-  "background_color": "#0033FF"
+  "background_color": "#FFFFFF"
 }
