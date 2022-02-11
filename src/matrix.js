@@ -1,16 +1,10 @@
-import { createArray, deepCloneArray } from './utils.js';
+import {
+  createArray,
+  createMatrix,
+  deepCloneArray,
+  mapBinaryMatrixToText,
+} from './utils.js';
 
-
-export function createBlankCanvas(width, height, filler = 0){
-  const row = createArray(width, filler);
-  return createArray(height, row);
-}
-
-export function generateCanvasTextContent(canvas) {
-  return canvas.map(row => {
-    return row.map(cell => cell ? '#' : ' ').join('');
-  }).join('\n');
-}
 
 export class Matrix {
 
@@ -50,9 +44,9 @@ export class Matrix {
 
     this.backgroundElement = document.createElement('div');
     this.backgroundElement.className = `${this.BASE_CLASSNAME} ${this.BASE_CLASSNAME}--background`;
-    this.backgroundElement.textContent = generateCanvasTextContent(
-      createBlankCanvas(this.width, this.height, 1)
-    );
+
+    const backgroundCanvas = createMatrix(this.width, this.height, 1);
+    this.backgroundElement.textContent = mapBinaryMatrixToText(backgroundCanvas, '#');
 
     this.container.appendChild(this.canvasElement);
     this.container.appendChild(this.backgroundElement);
@@ -92,7 +86,7 @@ export class Matrix {
       canvas = this.createCanvasWithFigure(figure);
     }
     if (this.didCanvasChange(canvas)) {
-      this.canvasElement.textContent = generateCanvasTextContent(canvas);
+      this.canvasElement.textContent = mapBinaryMatrixToText(canvas, '#');
     }
   };
 
@@ -106,10 +100,10 @@ export class Matrix {
   };
 
   reset = () => {
-    this.canvas = createBlankCanvas(this.width, this.height, 0);
+    this.canvas = createMatrix(this.width, this.height, 0);
   };
 
-  clearFilledRows = (callback) => {
+  clearFilledRows = () => {
     let clearedRowsCounter = 0;
     let clearedCanvas = [];
 
@@ -126,7 +120,7 @@ export class Matrix {
       ...createArray(clearedRowsCounter, emptyRow),
       ...clearedCanvas,
     ];
-    callback(clearedRowsCounter);
+    return new Promise(resolve => resolve(clearedRowsCounter));
   };
 
   isRowFilled = (row) => {

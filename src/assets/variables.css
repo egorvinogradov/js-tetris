@@ -10,11 +10,15 @@
 
   --landing-font-family: 'Press Start', 'Arial', sans-serif;
   --landing-font-size: 1.652vh;
-  --landing-letter-spacing: 0.14em;
+  --landing-line-height: 2.102vh;
+  --landing-letter-spacing: 0.15vh;
+
   --landing-color-text: #FFFFFF;
   --landing-color-text-hover: #FF4A00;
   --landing-color-text-keys: #FFDE00;
   --landing-color-background: #0033FF;
+
+  --landing-logo-cube-size: 0.9vh;
 
   --tetris-color-case: #353046;
   --tetris-color-glare: #FFFFFF;

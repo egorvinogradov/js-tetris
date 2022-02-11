@@ -8,31 +8,43 @@ export class PWA {
   beforeInstallPrompt = null;
 
   constructor(){
-    if (navigator.serviceWorker && !localStorage['debug']) {
-      this.registerServiceWorker();
+    if (localStorage['debug']) {
+      this.reset();
+      console.warn('SERVICE WORKER DISABLED');
     }
+
+    // TODO: uncomment after debug
+    // if (navigator.serviceWorker && !localStorage['debug']) {
+    //   this.registerServiceWorker();
+    // }
+
     this.renderIOSSplashScreen();
     window.addEventListener('beforeinstallprompt', this.onReadyToInstall);
     window.addEventListener('appinstalled', this.dismissPromptForever);
+
+    document.querySelector('.pwa-install-button').addEventListener('click', () => {
+      // TODO: show PWA installation popup
+    });
   }
 
   onReadyToInstall = (beforeInstallPrompt) => {
     beforeInstallPrompt.preventDefault();
     this.beforeInstallPrompt = beforeInstallPrompt;
 
-    this.promptElement = document.querySelector('.installation');
-    this.buttonYesElement = document.querySelector('.installation-options-item--yes');
-    this.buttonNoElement = document.querySelector('.installation-options-item--no');
-    this.buttonNeverElement = document.querySelector('.installation-options-item--never');
+    // TODO: rewrite logic according to new design
+    // this.promptElement = document.querySelector('.installation');
+    // this.buttonYesElement = document.querySelector('.installation-options-item--yes');
+    // this.buttonNoElement = document.querySelector('.installation-options-item--no');
+    // this.buttonNeverElement = document.querySelector('.installation-options-item--never');
 
     if (this.canShowInstallationPrompt()) {
-      this.promptElement.hidden = false; // TODO: redesign appearance
-      this.buttonYesElement.addEventListener('click', this.install);
-      this.buttonNoElement.addEventListener('click', this.dismissPromptOnce);
+      // this.promptElement.hidden = false; // TODO: redesign appearance
+      // this.buttonYesElement.addEventListener('click', this.install);
+      // this.buttonNoElement.addEventListener('click', this.dismissPromptOnce);
 
       if (this.getPromptDismissalAttempts() > 0) {
-        this.buttonNeverElement.hidden = false;
-        this.buttonNeverElement.addEventListener('click', this.dismissPromptForever);
+        // this.buttonNeverElement.hidden = false;
+        // this.buttonNeverElement.addEventListener('click', this.dismissPromptForever);
       }
     }
   };
@@ -44,12 +56,12 @@ export class PWA {
   dismissPromptOnce = () => {
     localStorage['prompt_dismissal_attempts'] = this.getPromptDismissalAttempts() + 1;
     localStorage['prompt_dismissal_date'] = +new Date();
-    this.promptElement.hidden = true; // TODO: redesign appearance
+    // this.promptElement.hidden = true; // TODO: rewrite logic according to new design
   };
 
   dismissPromptForever = () => {
     localStorage['prompt_dismissal_attempts'] = this.PROMPT_DISMISSAL_MAX_ATTEMPTS;
-    this.promptElement.hidden = true; // TODO: redesign appearance
+    // this.promptElement.hidden = true; // TODO: rewrite logic according to new design
   };
 
   canShowInstallationPrompt = () => {
@@ -70,7 +82,7 @@ export class PWA {
         if (result.outcome === 'accepted') {
           delete localStorage['prompt_dismissal_attempts'];
           delete localStorage['prompt_dismissal_date'];
-          this.promptElement.hidden = true; // TODO: redesign appearance
+          // this.promptElement.hidden = true; // TODO: rewrite logic according to new design
         }
         this.beforeInstallPrompt = null;
       });
@@ -124,7 +136,9 @@ export class PWA {
       });
     }
     for (let key in localStorage) {
-      localStorage.removeItem(key);
+      if (key !== 'debug') {
+        localStorage.removeItem(key);
+      }
     }
     return this.unregisterServiceWorkers();
   };

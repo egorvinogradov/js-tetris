@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8">
   <title>Tetris Brick Game E-1997</title>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no, shrink-to-fit=no"/>
 
-  <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1, viewport-fit=cover">
   <link rel="manifest" href="./manifest.webmanifest"/>
-
   <link rel="shortcut icon" type="image/x-icon" href="./src/assets/icons/favicon.ico"/>
-  <link rel="apple-touch-icon"  href="./src/assets/icons/icon-ios-192.png">
   <link rel="icon" sizes="192x192" href="./src/assets/icons/icon-android-192.png">
   <link rel="icon" sizes="512x512" href="./src/assets/icons/icon-android-512.png">
 
-  <!-- apple-touch-startup-image is updated dynamically in src/pwa.js -->
-  <link rel="apple-touch-startup-image" href="./src/assets/icons/icon-ios-splash-screen.png">
-
   <meta name="application-name" content="Brick Game">
-  <meta name="apple-mobile-web-app-title" content="Brick Game">
-
   <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="apple-mobile-web-app-title" content="Brick Game">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- apple-touch-startup-image is updated dynamically in src/pwa.js -->
+  <link rel="apple-touch-startup-image" href="./src/assets/icons/icon-ios-splash-screen.png">
+  <link rel="apple-touch-icon"  href="./src/assets/icons/icon-ios-192.png">
+
   <meta name="msapplication-TileColor" content="#0033FF">
   <meta name="msapplication-TileImage" content="./src/assets/icons/icon-windows-144.png">
   <meta name="msapplication-starturl" content="/">
@@ -35,59 +35,77 @@
   <div class="figure-type-o"><i></i><i></i><i></i><i></i></div>
 </a>
 
-<div class="options">
-  <button class="options-sound">
-    Sound
-    <i class="options-sound-icon"></i>
-  </button>
-  <div class="options-paused">Paused</div>
-  <div class="options-reset-pwa">&gt; Reset PWA</div>
-</div>
 
-<div class="installation" hidden>
-  Install app?
-  <div class="installation-install" hidden>&gt; Install</div>
-  <ul class="installation-options">
-    <li class="installation-options-item installation-options-item--yes">Yes, install</li>
-    <li class="installation-options-item installation-options-item--no">No</li>
-    <li class="installation-options-item installation-options-item--never" hidden>No, never ask me again</li>
-  </ul>
-</div>
 
-<div class="credits">
-  <a href="https://github.com/egorvinogradov/js-tetris" target="_blank">Github</a>
-</div>
 
-<div class="menu">
-  <table class="menu-keyboard">
+
+<!--<div class="options" hidden>-->
+<!--  <button class="options-sound">-->
+<!--    Sound-->
+<!--    <i class="options-sound-icon"></i>-->
+<!--  </button>-->
+<!--  <div class="options-paused">Paused</div>-->
+<!--  <div class="options-reset-pwa">&gt; Reset PWA</div>-->
+<!--</div>-->
+
+
+
+<!--<div class="installation" hidden>-->
+<!--  Install app?-->
+<!--  <div class="installation-install" hidden>&gt; Install</div>-->
+<!--  <ul class="installation-options">-->
+<!--    <li class="installation-options-item installation-options-item&#45;&#45;yes">Yes, install</li>-->
+<!--    <li class="installation-options-item installation-options-item&#45;&#45;no">No</li>-->
+<!--    <li class="installation-options-item installation-options-item&#45;&#45;never" hidden>No, never ask me again</li>-->
+<!--  </ul>-->
+<!--</div>-->
+
+
+<!--<div class="credits" hidden>-->
+<!--  <a href="https://github.com/egorvinogradov/js-tetris" target="_blank">Github</a>-->
+<!--</div>-->
+
+
+<button class="pwa-install-button">♥ Want App?</button>
+
+
+<ul class="menu-mobile">
+  <li class="menu-mobile-item menu-mobile-play">New Game</li>
+  <li class="menu-mobile-item">Settings</li>
+  <li class="menu-mobile-item">About</li>
+</ul>
+
+
+<div class="menu-desktop">
+  <table class="menu-desktop-keyboard">
     <tr>
       <td></td>
-      <td><button class="menu-play">New Game</button></td>
+      <td><button class="menu-desktop-play">New Game</button></td>
     </tr>
     <tr>
-      <td class="menu-keyboard-keys">
+      <td class="menu-desktop-keyboard-keys">
         <kbd>&lt;</kbd>
-        <kbd><span class="menu-keyboard-rotate-clockwise">&gt;</span></kbd>
+        <kbd><span class="menu-desktop-keyboard-rotate-clockwise">&gt;</span></kbd>
         <kbd>&gt;</kbd>
       </td>
-      <td>Move<span class="menu-keyboard-extra">/Accelerate</span></td>
+      <td>Move<span class="menu-desktop-keyboard-extra">/Accelerate</span></td>
     </tr>
     <tr>
-      <td class="menu-keyboard-keys">
-        <kbd><span class="menu-keyboard-rotate-clockwise">&lt;</span></kbd>
+      <td class="menu-desktop-keyboard-keys">
+        <kbd><span class="menu-desktop-keyboard-rotate-clockwise">&lt;</span></kbd>
       </td>
       <td>Rotate</td>
     </tr>
     <tr>
-      <td class="menu-keyboard-keys"><kbd>M</kbd></td>
+      <td class="menu-desktop-keyboard-keys"><kbd>M</kbd></td>
       <td>Mute</td>
     </tr>
     <tr>
-      <td class="menu-keyboard-keys"><kbd>P</kbd></td>
+      <td class="menu-desktop-keyboard-keys"><kbd>P</kbd></td>
       <td>Pause</td>
     </tr>
     <tr>
-      <td class="menu-keyboard-keys"><kbd>Esc</kbd></td>
+      <td class="menu-desktop-keyboard-keys"><kbd>Esc</kbd></td>
       <td>Quit</td>
     </tr>
   </table>

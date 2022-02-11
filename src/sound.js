@@ -1,4 +1,4 @@
-import { addBodyClass, removeBodyClass } from './utils.js';
+import { addRootClass, removeRootClass } from './utils.js';
 
 export class Sound {
 
@@ -27,7 +27,7 @@ export class Sound {
   constructor(){
     this.isMute = JSON.parse(localStorage['mute'] || false);
     if (this.isMute) {
-      addBodyClass(this.CLASSNAME_MUTED);
+      addRootClass(this.CLASSNAME_MUTED);
     }
   }
 
@@ -41,11 +41,11 @@ export class Sound {
 
     if (isMute) {
       this.stopBackgroundNoise();
-      addBodyClass(this.CLASSNAME_MUTED);
+      addRootClass(this.CLASSNAME_MUTED);
     }
     else {
       this.startBackgroundNoise();
-      removeBodyClass(this.CLASSNAME_MUTED);
+      removeRootClass(this.CLASSNAME_MUTED);
     }
   };
 

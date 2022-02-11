@@ -6,6 +6,17 @@ export function createArray(size, filler){
   return [ ...new Array(size) ].map(() => filler);
 }
 
+export function createMatrix(width, height, filler){
+  const row = createArray(width, filler);
+  return createArray(height, row);
+}
+
+export function mapBinaryMatrixToText(matrix, filler) {
+  return matrix.map(row => {
+    return row.map(cell => cell ? filler : ' ').join('');
+  }).join('\n');
+}
+
 export function deepCloneArray(array) {
   const cloned = [];
   array.forEach(item => {
@@ -25,12 +36,12 @@ export function setCSSVariable(key, value) {
   document.documentElement.style.setProperty(key, value);
 }
 
-export function addBodyClass(className) {
-  document.body.classList.add(className);
+export function addRootClass(className) {
+  document.documentElement.classList.add(className);
 }
 
-export function removeBodyClass(className) {
-  document.body.classList.remove(className);
+export function removeRootClass(className) {
+  document.documentElement.classList.remove(className);
 }
 
 export function capitalize(str) {
@@ -87,4 +98,29 @@ export function applySVGFilter(elements, effects) {
     }
     element.style.setProperty('filter', `url(#${filterId}) ${currentFilters}`);
   });
+}
+
+export function detectDeviceCharacteristics(){
+  const isIOS = /iPhone|iPod|iPad/i.test(navigator.userAgent);
+  const isLateIPadOS = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 2;
+
+  // const isTouchDevice = window.ontouchstart
+  //   || navigator.maxTouchPoints > 0
+  //   || navigator.msMaxTouchPoints > 0;
+  const isTouchDevice = window.innerWidth < 500; // TODO: remove after debug
+
+  let deviceType = 'desktop';
+  if (isTouchDevice) {
+    if (screen.availWidth < screen.availHeight && screen.availWidth < 420) {
+      deviceType = 'phone';
+    }
+    else {
+      deviceType = 'tablet';
+    }
+  }
+  return {
+    deviceType,
+    isTouchDevice,
+    isIOS: isIOS || isLateIPadOS,
+  };
 }

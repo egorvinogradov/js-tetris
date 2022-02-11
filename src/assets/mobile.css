@@ -1,0 +1,72 @@
+.device--touch {
+  --position-tetris-translate-x: 32%;
+  --position-tetris-translate-y: 0.5%;
+  --position-tetris-translate-rotation: 16deg;
+
+  --landing-font-size: 1.997vh;
+  --landing-line-height: 2.567vh;
+  --landing-logo-cube-size: 1vh;
+
+  touch-action: pan-x pan-y;
+  user-select: none;
+  height: 100vh;
+}
+
+.device--touch body {
+  position: fixed;
+}
+
+.device--touch .logo {
+  top: 5.7vh;
+  left: 50%;
+  margin: 0 0 0 -24vh;
+}
+
+.device--touch .menu-desktop {
+  display: none;
+}
+
+.device--touch .menu-mobile {
+  display: block;
+}
+
+.menu-mobile {
+  display: none;
+  position: absolute;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 -24vh;
+  top: 13.5vh;
+  left: 50%;
+}
+
+.menu-mobile-item {
+  margin-bottom: 4.2vh;
+  position: relative;
+  word-spacing: -0.856vh;
+}
+
+.menu-mobile-play:before {
+  content: '>';
+  position: absolute;
+  top: 0;
+  left: -2.568vh;
+}
+
+.pwa-install-button {
+  position: fixed;
+  bottom: 1.5vh;
+  left: 1.5vh;
+  z-index: 1;
+  border: 0;
+  background: var(--landing-color-text);
+  color: #000000;
+  padding: 2.568vh 2.996vh 2.14vh 2.71vh;
+  white-space: nowrap;
+  word-spacing: -0.5vh;
+}
+
+.pwa-install-button:first-letter {
+  color: var(--landing-color-text-hover);
+  font-size: 105%;
+}

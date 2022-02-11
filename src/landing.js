@@ -1,11 +1,11 @@
 import { Tetris, TETRIS_EVENTS } from './tetris.js';
 import { PWA } from './pwa.js';
 import {
-  addBodyClass,
-  removeBodyClass,
+  addRootClass,
+  removeRootClass,
   applySVGFilter,
   setCSSVariable,
-  random,
+  random, detectDeviceCharacteristics,
 } from './utils.js';
 
 export class BrickGameLanding {
@@ -24,6 +24,9 @@ export class BrickGameLanding {
   TETRIS_TO_WINDOW_HEIGHT_RATIO = 1.082;
   TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME = 1.624;
 
+  TETRIS_TO_WINDOW_HEIGHT_RATIO_MOBILE = 0.978;
+  TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME_MOBILE = 1.624;
+
   /**
    * @type {Tetris}
    */
@@ -33,20 +36,62 @@ export class BrickGameLanding {
    * @type {PWA}
    */
   pwa = null;
+  device = detectDeviceCharacteristics();
 
   constructor(){
     this.animateLogo();
     this.scaleTetris();
+    this.applyDeviceBasedLogic();
     this.applyVisualEffects();
 
     this.pwa = new PWA();
-
     // TODO: move to settings, change appearance, optimize code
-    document.querySelector('.options-reset-pwa').addEventListener('click', this.pwa.reset);
+    // document.querySelector('.options-reset-pwa').addEventListener('click', this.pwa.reset);
 
     window.addEventListener('load', this.initializeTetris);
-    window.addEventListener('resize', this.scaleTetris);
   }
+
+  applyDeviceBasedLogic = () => {
+    const { deviceType, isTouchDevice, isIOS } = this.device;
+    addRootClass('device--' + deviceType);
+
+    if (isTouchDevice) {
+      addRootClass('device--touch');
+    }
+    if (isIOS) {
+      addRootClass('device--ios');
+    }
+
+    if (isTouchDevice && screen.orientation) {
+      screen.orientation.lock('portrait');
+    }
+
+    // TODO: check on iOS
+    document.addEventListener('touchmove', function (event) {
+      if (event.scale !== 1) { event.preventDefault(); }
+    }, { passive: false });
+
+    // TODO: check on iOS
+
+    var lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+      var now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+
+    if (this.device.isTouchDevice) {
+      window.addEventListener('orientationchange', () => {
+        // TODO: check on iOS
+      });
+    }
+    else {
+      window.addEventListener('resize', this.scaleTetris);
+    }
+  };
 
   initializeTetris = () => {
     this.tetris = new Tetris({
@@ -55,30 +100,31 @@ export class BrickGameLanding {
       gameScreenContainer: document.querySelector(this.TETRIS_GAME_SCREEN_SELECTOR),
       nextFigureScreenContainer: document.querySelector(this.TETRIS_NEXT_FIGURE_SCREEN_SELECTOR),
     });
-
     this.tetris.on(TETRIS_EVENTS.NEW_GAME, () => {
-      removeBodyClass(this.CLASSNAME_PAUSED);
-      removeBodyClass(this.CLASSNAME_GAME_OVER);
-      addBodyClass(this.CLASSNAME_ONGOING_GAME);
+      this.resetTetrisClassnames();
+      addRootClass(this.CLASSNAME_ONGOING_GAME);
     });
-    this.tetris.on(TETRIS_EVENTS.QUIT, () => {
-      removeBodyClass(this.CLASSNAME_PAUSED);
-      removeBodyClass(this.CLASSNAME_GAME_OVER);
-      removeBodyClass(this.CLASSNAME_ONGOING_GAME);
-    });
-    this.tetris.on(TETRIS_EVENTS.PLAY, () => {
-      removeBodyClass(this.CLASSNAME_PAUSED);
-    });
-    this.tetris.on(TETRIS_EVENTS.PAUSE, () => {
-      addBodyClass(this.CLASSNAME_PAUSED);
+    this.tetris.on(TETRIS_EVENTS.PLAY_PAUSE, isPaused => {
+      isPaused ? addRootClass(this.CLASSNAME_PAUSED) : removeRootClass(this.CLASSNAME_PAUSED);
     });
     this.tetris.on(TETRIS_EVENTS.FAIL, () => {
-      addBodyClass(this.CLASSNAME_GAME_OVER);
+      addRootClass(this.CLASSNAME_GAME_OVER);
     });
+    this.tetris.on(TETRIS_EVENTS.QUIT, this.resetTetrisClassnames);
 
-    addBodyClass(this.CLASSNAME_INITIALIZED);
-    document.querySelector('.menu-play').addEventListener('click', this.tetris.launchNewGame);
-    document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
+    document.querySelector('.menu-desktop-play').addEventListener('click', this.tetris.launchNewGame);
+    document.querySelector('.menu-mobile-play').addEventListener('click', this.tetris.launchNewGame);
+
+    // TODO: rewrite logic according to new design
+    // document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
+
+    addRootClass(this.CLASSNAME_INITIALIZED);
+  };
+
+  resetTetrisClassnames = () => {
+    removeRootClass(this.CLASSNAME_PAUSED);
+    removeRootClass(this.CLASSNAME_GAME_OVER);
+    removeRootClass(this.CLASSNAME_ONGOING_GAME);
   };
 
   applyVisualEffects = () => {
@@ -95,11 +141,19 @@ export class BrickGameLanding {
   };
 
   scaleTetris = () => {
-    const tetrisHeight = window.innerHeight * this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
+    const sizeRatioInitial = this.device.isTouchDevice
+      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_MOBILE
+      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
+
+    const sizeRatioOngoingGame = this.device.isTouchDevice
+      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME_MOBILE
+      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME;
+
+    const tetrisHeight = window.innerHeight * sizeRatioInitial;
     const tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
     setCSSVariable('--position-tetris-scale', tetrisScale);
 
-    const tetrisHeightOngoingGame = window.innerHeight * this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME;
+    const tetrisHeightOngoingGame = window.innerHeight * sizeRatioOngoingGame;
     const tetrisScaleOngoingGame = tetrisHeightOngoingGame / this.TETRIS_ORIGINAL_HEIGHT;
     setCSSVariable('--position-tetris-ongoing-game-scale', tetrisScaleOngoingGame);
   };

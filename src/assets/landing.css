@@ -1,4 +1,5 @@
 @import './variables.css';
+@import './mobile.css';
 
 @font-face {
   font-family: 'Press Start';
@@ -15,8 +16,7 @@ body {
 
 body, button, kbd {
   color: var(--landing-color-text);
-  font: var(--landing-font-size)/var(--landing-font-size) var(--landing-font-family);
-  line-height: 120%;
+  font: var(--landing-font-size)/var(--landing-line-height) var(--landing-font-family);
   letter-spacing: var(--landing-letter-spacing);
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
@@ -43,20 +43,21 @@ a:hover {
   position: absolute;
   top: 4vh;
   left: 4vh;
-  --logo-square-shift: 8px;
+  --logo-cube-padding: calc(var(--landing-logo-cube-size) / 3);
+  --logo-cube-block: calc(var(--landing-logo-cube-size) + var(--logo-cube-padding));
 }
 
 .logo .figure-type-o {
-  width: calc(var(--logo-square-shift) * 3);
+  width: calc(var(--logo-cube-block) * 3);
 }
 
 .logo .figure-type-o i {
   border: 0;
   background: white;
   transition: transform 400ms;
-  width: 6px;
-  height: 6px;
-  margin: 0 2px 2px 0;
+  width: var(--landing-logo-cube-size);
+  height: var(--landing-logo-cube-size);
+  margin: 0 var(--logo-cube-padding) var(--logo-cube-padding) 0;
 }
 
 .logo .figure-type-o i:after {
@@ -65,16 +66,16 @@ a:hover {
 }
 
 .logo--frame-1 .figure-type-o i:nth-child(4) {
-  transform: translateX(var(--logo-square-shift));
+  transform: translateX(var(--logo-cube-block));
 }
 
 .logo--frame-2 .figure-type-o i:nth-child(1) {
-  transform: translateY(var(--logo-square-shift));
+  transform: translateY(var(--logo-cube-block));
 }
 
 .logo--frame-3 .figure-type-o i:nth-child(2),
 .logo--frame-3 .figure-type-o i:nth-child(3) {
-  transform: translateX(calc(var(--logo-square-shift)* -1));
+  transform: translateX(calc(var(--logo-cube-block)* -1));
 }
 
 
@@ -176,24 +177,24 @@ a:hover {
 
 /* MENU */
 
-.menu {
+.menu-desktop {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translateX(calc(-100% - 7.5vh)) translateY(-50%);
 }
 
-.ongoing-game .menu {
+.ongoing-game .menu-desktop {
   transform: translateX(calc(-100% - 25vh)) translateY(-50%);
 }
 
-.ongoing-game .menu-play,
-.ongoing-game .menu-keyboard-extra {
+.ongoing-game .menu-desktop-play,
+.ongoing-game .menu-desktop-keyboard-extra {
   opacity: 0;
   pointer-events: none;
 }
 
-.menu-play {
+.menu-desktop-play {
   border: 0;
   background: none;
   font-size: 3.1vh !important;
@@ -205,16 +206,15 @@ a:hover {
   word-spacing: -1.1vh;
 }
 
-.menu-play:before {
+.menu-desktop-play:before {
   content: '>';
   position: absolute;
   right: calc(100% + 1.45vh);
   top: 0;
 }
 
-.menu-play:after {
+.menu-desktop-play:after {
   display: none;
-
   content: '';
   position: absolute;
   width: calc(100% - 1.5vh);
@@ -224,46 +224,46 @@ a:hover {
   left: 0;
 }
 
-.menu-play:hover,
-.menu-play:hover:before {
+.menu-desktop-play:hover,
+.menu-desktop-play:hover:before {
   color: var(--landing-color-text-hover);
 }
 
-.menu-play:hover:after {
+.menu-desktop-play:hover:after {
   background: var(--landing-color-text-hover);
 }
 
-.menu-keyboard {
+.menu-desktop-keyboard {
   border-collapse: collapse;
   border: 0;
 }
 
-.menu-keyboard td {
+.menu-desktop-keyboard td {
   vertical-align: top;
   padding: 0 0 3.3vh 0;
   white-space: nowrap;
   border: 0;
 }
 
-.menu-keyboard-keys {
+.menu-desktop-keyboard-keys {
   text-align: right;
   word-spacing: -1em;
   padding-right: 2.25vh !important;
 }
 
-.menu-keyboard-keys kbd {
+.menu-desktop-keyboard-keys kbd {
   color: var(--landing-color-text-keys);
 }
 
-.menu-keyboard-keys kbd:before {
+.menu-desktop-keyboard-keys kbd:before {
   content: '[';
 }
 
-.menu-keyboard-keys kbd:after {
+.menu-desktop-keyboard-keys kbd:after {
   content: ']';
 }
 
-.menu-keyboard-rotate-clockwise {
+.menu-desktop-keyboard-rotate-clockwise {
   transform: translate(-0.3vh, 0.15vh) rotate(90deg);
   display: inline-block;
 }
