@@ -92,7 +92,7 @@ export class PWA {
   registerServiceWorker = () => {
     return new Promise((resolve, reject) => {
       try {
-        navigator.serviceWorker.register(new URL('../service_worker.js', import.meta.url), { scope: '/' })
+        navigator.serviceWorker.register(new URL('../service_worker.js', import.meta.url), { type: 'module', scope: '/' })
           .then(resolve)
           .catch(reject);
       }

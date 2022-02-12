@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "browserslist": [
-    "since 2018"
+    "since 2016",
+    "iOS >= 10.2"
   ],
   "scripts": {
     "dev": "./bin/dev.sh",
@@ -20,16 +21,13 @@
   },
   "homepage": "https://github.com/egorvinogradov/js-tetris#readme",
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.16.7",
-    "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
-    "@babel/plugin-proposal-optional-chaining": "^7.16.7",
-    "@babel/preset-env": "^7.16.11",
-    "@parcel/packager-raw-url": "^2.2.1",
-    "@parcel/transformer-webmanifest": "^2.2.1",
+    "@babel/core": "^7.17.2",
+    "@babel/plugin-transform-spread": "^7.16.7",
+    "@parcel/packager-raw-url": "^2.3.1",
+    "@parcel/transformer-webmanifest": "^2.3.1",
     "autoprefixer": "^10.4.2",
     "concurrently": "^7.0.0",
-    "lmdb": "2.1.7",
-    "parcel": "^2.2.1",
+    "parcel": "^2.3.1",
     "postcss": "^8.4.6"
   }
 }
