@@ -107,7 +107,8 @@ export function detectDeviceCharacteristics(){
   // const isTouchDevice = window.ontouchstart
   //   || navigator.maxTouchPoints > 0
   //   || navigator.msMaxTouchPoints > 0;
-  const isTouchDevice = window.innerWidth < 500; // TODO: remove after debug
+  // const isTouchDevice = window.innerWidth <= 820; // TODO: remove after debug
+  const isTouchDevice = true; // TODO: remove after debug
 
   let deviceType = 'desktop';
   if (isTouchDevice) {
@@ -123,4 +124,8 @@ export function detectDeviceCharacteristics(){
     isTouchDevice,
     isIOS: isIOS || isLateIPadOS,
   };
+}
+
+export function getViewportHeight() {
+  return Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 }

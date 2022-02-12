@@ -3,9 +3,11 @@ import { PWA } from './pwa.js';
 import {
   addRootClass,
   removeRootClass,
-  applySVGFilter,
   setCSSVariable,
-  random, detectDeviceCharacteristics,
+  applySVGFilter,
+  detectDeviceCharacteristics,
+  getViewportHeight,
+  random,
 } from './utils.js';
 
 export class BrickGameLanding {
@@ -56,41 +58,71 @@ export class BrickGameLanding {
     addRootClass('device--' + deviceType);
 
     if (isTouchDevice) {
+      if (screen.orientation) {
+        screen.orientation.lock('portrait');
+      }
+      window.addEventListener('orientationchange', () => {
+        this.waitOrientationChangeEnd().then(this.scaleTetris);
+      });
       addRootClass('device--touch');
     }
+
     if (isIOS) {
+      this.preventPinchZoomInIOS();
+      this.preventDoubleTabZoomInIOS();
       addRootClass('device--ios');
     }
 
-    if (isTouchDevice && screen.orientation) {
-      screen.orientation.lock('portrait');
-    }
-
-    // TODO: check on iOS
-    document.addEventListener('touchmove', function (event) {
-      if (event.scale !== 1) { event.preventDefault(); }
-    }, { passive: false });
-
-    // TODO: check on iOS
-
-    var lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-      var now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-
-
-    if (this.device.isTouchDevice) {
-      window.addEventListener('orientationchange', () => {
-        // TODO: check on iOS
-      });
-    }
-    else {
+    if (!isTouchDevice) {
       window.addEventListener('resize', this.scaleTetris);
     }
+  };
+
+  waitOrientationChangeEnd = () => {
+    /**
+     * Waiting until viewport dimensions change after changeorientation event occurred
+     * @see https://stackoverflow.com/questions/12452349/mobile-viewport-height-after-orientation-change
+     */
+    return new Promise(resolve => {
+      const maxOrientationChangeDelay = 400;
+      let orientationChangeDelayTimeout = null;
+
+      const onOrientationChangeEnded = () => {
+        clearTimeout(orientationChangeDelayTimeout);
+        window.removeEventListener('resize', onOrientationChangeEnded);
+        resolve();
+      };
+      orientationChangeDelayTimeout = setTimeout(onOrientationChangeEnded, maxOrientationChangeDelay);
+      window.addEventListener('resize', onOrientationChangeEnded);
+    });
+  };
+
+  preventPinchZoomInIOS = () => {
+    /**
+     * In the future, this could be removed once touch-action: pan-x pan-y is widely adopted
+     */
+    document.addEventListener('touchmove', (e) => {
+      if (e.scale !== 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  };
+
+  preventDoubleTabZoomInIOS = () => {
+    /**
+     * The most reliable way to disable double tap zoom on iOS.
+     * <meta name=viewport content=user-scalable=no> and touch-action: manipulation; are not reliable.
+     * @see https://stackoverflow.com/questions/46167604/ios-html-disable-double-tap-to-zoom
+     */
+    let lastTouchEnd = 0;
+    const doubleTabDelay = 300; // see: https://stackoverflow.com/a/38958743
+    document.addEventListener('touchend', (e) => {
+      let now = +new Date();
+      if (now - lastTouchEnd <= doubleTabDelay) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    });
   };
 
   initializeTetris = () => {
@@ -149,11 +181,13 @@ export class BrickGameLanding {
       ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME_MOBILE
       : this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME;
 
-    const tetrisHeight = window.innerHeight * sizeRatioInitial;
+    const viewportHeight = getViewportHeight();
+
+    const tetrisHeight = viewportHeight * sizeRatioInitial;
     const tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
     setCSSVariable('--position-tetris-scale', tetrisScale);
 
-    const tetrisHeightOngoingGame = window.innerHeight * sizeRatioOngoingGame;
+    const tetrisHeightOngoingGame = viewportHeight * sizeRatioOngoingGame;
     const tetrisScaleOngoingGame = tetrisHeightOngoingGame / this.TETRIS_ORIGINAL_HEIGHT;
     setCSSVariable('--position-tetris-ongoing-game-scale', tetrisScaleOngoingGame);
   };
