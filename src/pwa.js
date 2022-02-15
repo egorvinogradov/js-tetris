@@ -154,4 +154,14 @@ export class PWA {
       });
     }
   };
+
+  isRunningStandalone = () => {
+    const isStandaloneIOS = Boolean(navigator.standalone);
+    let isStandaloneChrome = false;
+    try {
+      isStandaloneChrome = Boolean(window.matchMedia('(display-mode: standalone)').matches); // Chrome
+    }
+    catch (e) {}
+    return isStandaloneIOS || isStandaloneChrome;
+  };
 }

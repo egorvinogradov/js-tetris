@@ -7,6 +7,7 @@
 }
 
 body {
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
   background: var(--landing-color-background);
@@ -16,7 +17,9 @@ body {
 
 body, button, kbd {
   color: var(--landing-color-text);
-  font: var(--landing-font-size)/var(--landing-line-height) var(--landing-font-family);
+
+
+  font: var(--landing-font-size)/1em var(--landing-font-family);
   letter-spacing: var(--landing-letter-spacing);
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
@@ -41,8 +44,10 @@ a:hover {
 
 .logo {
   position: absolute;
-  top: 4vh;
-  left: 4vh;
+  top: 0;
+  left: 0;
+  transform: translate(var(--landing-logo-x), var(--landing-logo-y));
+
   --logo-cube-padding: calc(var(--landing-logo-cube-size) / 3);
   --logo-cube-block: calc(var(--landing-logo-cube-size) + var(--logo-cube-padding));
 }
@@ -84,8 +89,8 @@ a:hover {
 
 .credits {
   position: absolute;
-  bottom: 3.5vh;
-  right: 3.5vh;
+  bottom: calc(var(--landing-font-size) * 2);
+  right: calc(var(--landing-font-size) * 2);
 }
 
 
@@ -95,8 +100,8 @@ a:hover {
 .options {
   position: absolute;
   z-index: 1;
-  top: 5.2vh;
-  right: 4vh;
+  top: calc(var(--landing-font-size) * 2);
+  right: calc(var(--landing-font-size) * 2);
 }
 
 .options-sound {
@@ -110,29 +115,27 @@ a:hover {
 .options-sound-icon:before,
 .options-sound-icon:after {
   content: '';
-  width: 3px;
+  width: calc(var(--landing-font-size) * 0.265);
   background: var(--landing-color-text);
 }
 
 .options-sound-icon {
   display: inline-block;
-  margin-top: -1px;
-  margin-right: 13px;
   vertical-align: middle;
   position: relative;
-  height: 6px;
+  height: calc(var(--landing-font-size) * 0.5);
 }
 
 .options-sound-icon:before {
   position: absolute;
-  left: -5px;
+  left: calc(var(--landing-font-size) * -0.5);
   bottom: 0;
   height: 50%;
 }
 
 .options-sound-icon:after {
   position: absolute;
-  right: -5px;
+  right: calc(var(--landing-font-size) * -0.5);
   bottom: 0;
   height: 150%;
 }
@@ -146,8 +149,9 @@ a:hover {
   height: 100%;
   background: none;
   font-style: normal;
-  font-size: 2.4vh;
-  line-height: 1vh;
+  font-size: calc(var(--landing-font-size) * 1.25);
+  position: relative;
+  top: calc(var(--landing-font-size) * -0.35);
 }
 
 .muted .options-sound .options-sound-icon:after {
@@ -155,7 +159,7 @@ a:hover {
 }
 
 .options-paused {
-  padding-top: 3vh;
+  padding-top: calc(var(--landing-font-size) * 2);
   opacity: 0;
   pointer-events: none;
 }
@@ -179,13 +183,13 @@ a:hover {
 
 .menu-desktop {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(calc(-100% - 7.5vh)) translateY(-50%);
+  top: 0;
+  left: 0;
+  transform: translate(var(--landing-menu-x), var(--landing-menu-y));
 }
 
 .ongoing-game .menu-desktop {
-  transform: translateX(calc(-100% - 25vh)) translateY(-50%);
+  /* TODO: fix */
 }
 
 .ongoing-game .menu-desktop-play,
@@ -197,40 +201,24 @@ a:hover {
 .menu-desktop-play {
   border: 0;
   background: none;
-  font-size: 3.1vh !important;
+  font-size: 2em;
   position: relative;
   cursor: pointer;
-  margin: 4vh 0;
   padding: 0;
+  margin-bottom: calc(var(--landing-font-size) * 2);
   transition: opacity 500ms;
-  word-spacing: -1.1vh;
+  word-spacing: -0.25em;
 }
 
 .menu-desktop-play:before {
   content: '>';
   position: absolute;
-  right: calc(100% + 1.45vh);
+  left: calc(var(--landing-font-size) * -3);
   top: 0;
 }
 
-.menu-desktop-play:after {
-  display: none;
-  content: '';
-  position: absolute;
-  width: calc(100% - 1.5vh);
-  height: 0.6vh;
-  background: var(--landing-color-text);
-  bottom: -0.45vh;
-  left: 0;
-}
-
-.menu-desktop-play:hover,
-.menu-desktop-play:hover:before {
+.menu-desktop-play:hover {
   color: var(--landing-color-text-hover);
-}
-
-.menu-desktop-play:hover:after {
-  background: var(--landing-color-text-hover);
 }
 
 .menu-desktop-keyboard {
@@ -240,7 +228,7 @@ a:hover {
 
 .menu-desktop-keyboard td {
   vertical-align: top;
-  padding: 0 0 3.3vh 0;
+  padding: 0 0 calc(var(--landing-font-size) * 2.5) 0;
   white-space: nowrap;
   border: 0;
 }
@@ -248,7 +236,7 @@ a:hover {
 .menu-desktop-keyboard-keys {
   text-align: right;
   word-spacing: -1em;
-  padding-right: 2.25vh !important;
+  padding-right: calc(var(--landing-font-size) * 1.2) !important;
 }
 
 .menu-desktop-keyboard-keys kbd {
@@ -264,7 +252,7 @@ a:hover {
 }
 
 .menu-desktop-keyboard-rotate-clockwise {
-  transform: translate(-0.3vh, 0.15vh) rotate(90deg);
+  transform: translateX(calc(var(--landing-font-size) * -0.2)) rotate(90deg);
   display: inline-block;
 }
 
@@ -274,27 +262,25 @@ a:hover {
 
 .landing-tetris {
   position: absolute;
-  width: 257px;
-  height: 601px;
-  left: 50%;
-  top: 50%;
-  margin-left: -130px;
-  margin-top: -300px;
-  transform-origin: center;
+  width: var(--tetris-width);
+  height: var(--tetris-height);
+  top: 0;
+  right: 0;
+  transform-origin: right top;
   transform:
-    rotate(var(--position-tetris-translate-rotation))
-    scale(var(--position-tetris-scale))
     translateX(var(--position-tetris-translate-x))
-    translateY(var(--position-tetris-translate-y));
+    translateY(var(--position-tetris-translate-y))
+    scale(var(--position-tetris-scale))
+    rotate(var(--position-tetris-rotation));
   box-shadow: -20px -4px 25px -2px #0009AD;
 }
 
 .ongoing-game .landing-tetris {
   transform:
-    rotate(0.5deg)
-    scale(var(--position-tetris-ongoing-game-scale))
     translateX(var(--position-tetris-ongoing-game-translate-x))
-    translateY(var(--position-tetris-ongoing-game-translate-y));
+    translateY(var(--position-tetris-ongoing-game-translate-y))
+    scale(var(--position-tetris-ongoing-game-scale))
+    rotate(0.5deg);
 }
 
 
@@ -349,7 +335,7 @@ a:hover {
 
 
 
-/* SWITCHING STATES */
+/* INITIALIZING */
 
 .logo,
 .menu,

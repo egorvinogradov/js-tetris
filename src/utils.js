@@ -32,8 +32,16 @@ export function deepCloneArray(array) {
   return cloned;
 }
 
-export function setCSSVariable(key, value) {
-  document.documentElement.style.setProperty(key, value);
+export function getCSSVariable(key, numberOnly) {
+  let value = getComputedStyle(document.documentElement).getPropertyValue(key);
+  if (numberOnly) {
+    value = +value.replace(/[a-z]+$/ig, '');
+  }
+  return value;
+}
+
+export function setCSSVariable(key, value, unit) {
+  document.documentElement.style.setProperty(key, (value || 0) + (unit && value ? unit : ''));
 }
 
 export function addRootClass(className) {
@@ -100,19 +108,17 @@ export function applySVGFilter(elements, effects) {
   });
 }
 
-export function detectDeviceCharacteristics(){
+export function getDeviceCharacteristics(){
   const isIOS = /iPhone|iPod|iPad/i.test(navigator.userAgent);
   const isLateIPadOS = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 2;
-
-  // const isTouchDevice = window.ontouchstart
-  //   || navigator.maxTouchPoints > 0
-  //   || navigator.msMaxTouchPoints > 0;
-  // const isTouchDevice = window.innerWidth <= 820; // TODO: remove after debug
-  const isTouchDevice = true; // TODO: remove after debug
+  const isTouchDevice = window.ontouchstart
+    || navigator.maxTouchPoints > 0
+    || navigator.msMaxTouchPoints > 0;
 
   let deviceType = 'desktop';
   if (isTouchDevice) {
-    if (screen.availWidth < screen.availHeight && screen.availWidth < 420) {
+    const screenWidth = Math.min(screen.availWidth, screen.availHeight);
+    if (screenWidth < 420) {
       deviceType = 'phone';
     }
     else {
@@ -126,6 +132,28 @@ export function detectDeviceCharacteristics(){
   };
 }
 
-export function getViewportHeight() {
-  return Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+/**
+ * Equivalent to CSS vh unit
+ */
+export function vh(percentage) {
+  return getViewport().height * percentage / 100;
+}
+
+/**
+ * Equivalent to CSS vw unit
+ */
+export function vw(percentage) {
+  return getViewport().width * percentage / 100;
+}
+
+export function getViewport() {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+}
+
+export function getOrientation() {
+  const viewport = getViewport();
+  return viewport.width < viewport.height ? 'portrait' : 'landscape';
 }

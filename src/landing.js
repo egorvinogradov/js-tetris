@@ -3,31 +3,104 @@ import { PWA } from './pwa.js';
 import {
   addRootClass,
   removeRootClass,
+  getCSSVariable,
   setCSSVariable,
   applySVGFilter,
-  detectDeviceCharacteristics,
-  getViewportHeight,
+  getDeviceCharacteristics,
+  getOrientation,
+  getViewport,
   random,
+  vw,
+  vh,
 } from './utils.js';
 
+
 export class BrickGameLanding {
+
+  OBJECT_POSITIONS_CONFIG = {
+    phone: {
+      portrait: {
+        contentRatio: 0.82,
+        tetrisScaleRation: 0.72,
+        tetrisRotation: 16,
+        tetrisX: 30,
+        tetrisY: 10,
+        menuX: 9.6,
+        menuY: 24,
+        logoX: 9.6,
+        logoY: 10,
+        logoCubeSize: 1.6,
+        fontSize: 3.7,
+      },
+      landscape: {
+        contentRatio: 2.5,
+        tetrisScaleRation: 1.05,
+        tetrisRotation: 16,
+        tetrisY: 8,
+        menuX: 0,
+        menuY: 34,
+        logoX: 10,
+        logoY: 10,
+        logoCubeSize: 2.2,
+        fontSize: 4.4,
+      },
+    },
+    tablet: {
+      portrait: {
+        contentRatio: 0.9,
+        tetrisScaleRation: 1,
+        tetrisRotation: 12,
+        tetrisX: 10,
+        tetrisY: 7,
+        menuX: 8,
+        menuY: 20,
+        logoX: 8,
+        logoY: 7,
+        logoCubeSize: 1.2,
+        fontSize: 2.7,
+      },
+      landscape: {
+        contentRatio: 2.3,
+        tetrisScaleRation: 1.05,
+        tetrisRotation: 12,
+        tetrisY: 4,
+        menuX: 10,
+        menuY: 38,
+        logoX: 6,
+        logoY: 7,
+        logoCubeSize: 1.2,
+        fontSize: 2.7,
+      },
+    },
+    desktop: {
+      landscape: {
+        contentRatio: 2.5,
+        tetrisScaleRation: 1,
+        tetrisRotation: 12,
+        tetrisY: 7,
+        menuX: 0,
+        menuY: 30,
+        logoX: 6,
+        logoY: 7,
+        logoCubeSize: 1,
+        fontSize: 1.65,
+      },
+    },
+  };
+
+  TETRIS_ORIGINAL_WIDTH = getCSSVariable('--tetris-width', true);
+  TETRIS_ORIGINAL_HEIGHT = getCSSVariable('--tetris-height', true);
+  STANDALONE_OFFSET_Y = 20;
 
   CLASSNAME_INITIALIZED = 'initialized';
   CLASSNAME_ONGOING_GAME = 'ongoing-game';
   CLASSNAME_PAUSED = 'paused';
   CLASSNAME_GAME_OVER = 'game-over';
 
-  TETRIS_WIDTH_POINTS = 10;
-  TETRIS_HEIGHT_POINTS = 20;
-  TETRIS_GAME_SCREEN_SELECTOR = '.screen-game';
-  TETRIS_NEXT_FIGURE_SCREEN_SELECTOR = '.screen-next-figure';
-
-  TETRIS_ORIGINAL_HEIGHT = 601;
-  TETRIS_TO_WINDOW_HEIGHT_RATIO = 1.082;
-  TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME = 1.624;
-
-  TETRIS_TO_WINDOW_HEIGHT_RATIO_MOBILE = 0.978;
-  TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME_MOBILE = 1.624;
+  MATRIX_WIDTH = 10;
+  MATRIX_HEIGHT = 20;
+  GAME_SCREEN_SELECTOR = '.screen-game';
+  NEXT_FIGURE_SCREEN_SELECTOR = '.screen-next-figure';
 
   /**
    * @type {Tetris}
@@ -38,15 +111,16 @@ export class BrickGameLanding {
    * @type {PWA}
    */
   pwa = null;
-  device = detectDeviceCharacteristics();
+  device = getDeviceCharacteristics();
 
   constructor(){
+    this.pwa = new PWA();
+
     this.animateLogo();
-    this.scaleTetris();
+    this.repositionObjects();
     this.applyDeviceBasedLogic();
     this.applyVisualEffects();
 
-    this.pwa = new PWA();
     // TODO: move to settings, change appearance, optimize code
     // document.querySelector('.options-reset-pwa').addEventListener('click', this.pwa.reset);
 
@@ -62,7 +136,7 @@ export class BrickGameLanding {
         screen.orientation.lock('portrait');
       }
       window.addEventListener('orientationchange', () => {
-        this.waitOrientationChangeEnd().then(this.scaleTetris);
+        this.waitOrientationChangeEnd().then(this.repositionObjects);
       });
       addRootClass('device--touch');
     }
@@ -74,7 +148,7 @@ export class BrickGameLanding {
     }
 
     if (!isTouchDevice) {
-      window.addEventListener('resize', this.scaleTetris);
+      window.addEventListener('resize', this.repositionObjects);
     }
   };
 
@@ -127,10 +201,10 @@ export class BrickGameLanding {
 
   initializeTetris = () => {
     this.tetris = new Tetris({
-      gameWidth: this.TETRIS_WIDTH_POINTS,
-      gameHeight: this.TETRIS_HEIGHT_POINTS,
-      gameScreenContainer: document.querySelector(this.TETRIS_GAME_SCREEN_SELECTOR),
-      nextFigureScreenContainer: document.querySelector(this.TETRIS_NEXT_FIGURE_SCREEN_SELECTOR),
+      gameWidth: this.MATRIX_WIDTH,
+      gameHeight: this.MATRIX_HEIGHT,
+      gameScreenContainer: document.querySelector(this.GAME_SCREEN_SELECTOR),
+      nextFigureScreenContainer: document.querySelector(this.NEXT_FIGURE_SCREEN_SELECTOR),
     });
     this.tetris.on(TETRIS_EVENTS.NEW_GAME, () => {
       this.resetTetrisClassnames();
@@ -159,37 +233,90 @@ export class BrickGameLanding {
     removeRootClass(this.CLASSNAME_ONGOING_GAME);
   };
 
-  applyVisualEffects = () => {
-    applySVGFilter(document.querySelector('.noise'), [
-      { type: 'turbulence', baseFrequency: 1 }
-    ]);
-    applySVGFilter(document.querySelector('.brand-image'), [
-      { type: 'composite', operator: 'in', result: 'composite', inSource: true, in2Source: true },
-      { type: 'turbulence', baseFrequency: 3, result: 'turbulence' },
-      { type: 'displacementMap', scale: 1, in: 'composite', in2: 'turbulence' },
-    ]);
-    this.renderScratches(document.querySelector('.scratches--curve'), 30);
-    this.renderScratches(document.querySelector('.scratches--bottom'), 100);
+  repositionObjects = () => {
+    const { deviceType } = getDeviceCharacteristics();
+    const orientation = getOrientation();
+    const viewport = getViewport();
+
+    let config = this.OBJECT_POSITIONS_CONFIG[deviceType][orientation];
+    if (deviceType === 'desktop') {
+      config = this.OBJECT_POSITIONS_CONFIG.desktop.landscape;
+    }
+
+    let tetrisX;
+    let tetrisY;
+    let menuX;
+
+    let {
+      tetrisWidth,
+      tetrisHeight,
+      tetrisScale,
+    } = this.calculateTetrisDimensions(config.tetrisScaleRation);
+
+    const scalingFunction = orientation === 'portrait' ? vw : vh;
+
+    if (orientation === 'portrait') {
+      const contentMarginY = (viewport.height - tetrisHeight * config.contentRatio) / 2;
+      tetrisX = vw(config.tetrisX);
+      tetrisY = Math.max(contentMarginY, vh(config.tetrisY));
+      menuX = vw(config.menuX);
+    }
+    if (orientation === 'landscape') {
+      const contentMarginX = (viewport.width - tetrisWidth * config.contentRatio) / 2;
+      tetrisX = -contentMarginX;
+      tetrisY = vh(config.tetrisY);
+      menuX = contentMarginX + vh(config.menuX);
+    }
+
+    let menuY = scalingFunction(config.menuY);
+    let logoX = scalingFunction(config.logoX);
+    let logoY = scalingFunction(config.logoY);
+
+    if (this.pwa.isRunningStandalone()) {
+      menuY += this.STANDALONE_OFFSET_Y;
+      logoY += this.STANDALONE_OFFSET_Y;
+    }
+
+    const logoCubeSize =  scalingFunction(config.logoCubeSize);
+    const fontSize = scalingFunction(config.fontSize);
+
+    setCSSVariable('--position-tetris-translate-x', tetrisX, 'px');
+    setCSSVariable('--position-tetris-translate-y', tetrisY, 'px');
+    setCSSVariable('--position-tetris-scale', tetrisScale);
+    setCSSVariable('--position-tetris-rotation', config.tetrisRotation, 'deg');
+    setCSSVariable('--landing-menu-x', menuX, 'px');
+    setCSSVariable('--landing-menu-y', menuY, 'px');
+    setCSSVariable('--landing-logo-x', logoX, 'px');
+    setCSSVariable('--landing-logo-y', logoY, 'px');
+    setCSSVariable('--landing-logo-cube-size', logoCubeSize, 'px');
+    setCSSVariable('--landing-font-size', fontSize, 'px');
   };
 
-  scaleTetris = () => {
-    const sizeRatioInitial = this.device.isTouchDevice
-      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_MOBILE
-      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO;
+  calculateTetrisDimensions = (ratio) => {
+    const { deviceType } = this.device;
+    const orientation = getOrientation();
+    const viewport = getViewport();
+    const tetrisWidthToHeightRatio = this.TETRIS_ORIGINAL_WIDTH / this.TETRIS_ORIGINAL_HEIGHT;
 
-    const sizeRatioOngoingGame = this.device.isTouchDevice
-      ? this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME_MOBILE
-      : this.TETRIS_TO_WINDOW_HEIGHT_RATIO_ONGOING_GAME;
+    let tetrisWidth;
+    let tetrisHeight;
+    let tetrisScale;
 
-    const viewportHeight = getViewportHeight();
-
-    const tetrisHeight = viewportHeight * sizeRatioInitial;
-    const tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
-    setCSSVariable('--position-tetris-scale', tetrisScale);
-
-    const tetrisHeightOngoingGame = viewportHeight * sizeRatioOngoingGame;
-    const tetrisScaleOngoingGame = tetrisHeightOngoingGame / this.TETRIS_ORIGINAL_HEIGHT;
-    setCSSVariable('--position-tetris-ongoing-game-scale', tetrisScaleOngoingGame);
+    if (deviceType === 'phone' && orientation === 'portrait') {
+      tetrisWidth = viewport.width * ratio;
+      tetrisHeight = tetrisWidth / tetrisWidthToHeightRatio;
+      tetrisScale = tetrisWidth / this.TETRIS_ORIGINAL_WIDTH;
+    }
+    else {
+      tetrisHeight = viewport.height * ratio;
+      tetrisWidth = tetrisHeight * tetrisWidthToHeightRatio;
+      tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
+    }
+    return {
+      tetrisHeight,
+      tetrisWidth,
+      tetrisScale,
+    };
   };
 
   animateLogo = () => {
@@ -205,6 +332,19 @@ export class BrickGameLanding {
         logoElement.classList.add('logo--frame-' + stage);
       }
     }, interval);
+  };
+
+  applyVisualEffects = () => {
+    applySVGFilter(document.querySelector('.noise'), [
+      { type: 'turbulence', baseFrequency: 1 }
+    ]);
+    applySVGFilter(document.querySelector('.brand-image'), [
+      { type: 'composite', operator: 'in', result: 'composite', inSource: true, in2Source: true },
+      { type: 'turbulence', baseFrequency: 3, result: 'turbulence' },
+      { type: 'displacementMap', scale: 1, in: 'composite', in2: 'turbulence' },
+    ]);
+    this.renderScratches(document.querySelector('.scratches--curve'), 30);
+    this.renderScratches(document.querySelector('.scratches--bottom'), 100);
   };
 
   renderScratches = (container, scratchCount) => {
