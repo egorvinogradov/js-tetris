@@ -1,3 +1,5 @@
+import { addRootClass } from './utils.js';
+
 export class PWA {
 
   IOS_SPLASH_SCREEN_BACKGROUND = '#0033FF';
@@ -18,7 +20,9 @@ export class PWA {
     //   this.registerServiceWorker();
     // }
 
+    this.detectStandalone();
     this.renderIOSSplashScreen();
+
     window.addEventListener('beforeinstallprompt', this.onReadyToInstall);
     window.addEventListener('appinstalled', this.dismissPromptForever);
 
@@ -155,13 +159,15 @@ export class PWA {
     }
   };
 
-  isRunningStandalone = () => {
+  detectStandalone = () => {
     const isStandaloneIOS = Boolean(navigator.standalone);
     let isStandaloneChrome = false;
     try {
       isStandaloneChrome = Boolean(window.matchMedia('(display-mode: standalone)').matches); // Chrome
     }
     catch (e) {}
-    return isStandaloneIOS || isStandaloneChrome;
+    if (isStandaloneIOS || isStandaloneChrome) {
+      addRootClass('standalone');
+    }
   };
 }

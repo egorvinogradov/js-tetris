@@ -40,8 +40,8 @@ export function getCSSVariable(key, numberOnly) {
   return value;
 }
 
-export function setCSSVariable(key, value, unit) {
-  document.documentElement.style.setProperty(key, (value || 0) + (unit && value ? unit : ''));
+export function setCSSVariable(key, value, postfix) {
+  document.documentElement.style.setProperty(key, (value || 0) + (postfix || ''));
 }
 
 export function addRootClass(className) {
@@ -108,12 +108,16 @@ export function applySVGFilter(elements, effects) {
   });
 }
 
+export function supportsTouch() {
+  return window.ontouchstart
+    || navigator.maxTouchPoints > 0
+    || navigator.msMaxTouchPoints > 0;
+}
+
 export function getDeviceCharacteristics(){
   const isIOS = /iPhone|iPod|iPad/i.test(navigator.userAgent);
   const isLateIPadOS = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 2;
-  const isTouchDevice = window.ontouchstart
-    || navigator.maxTouchPoints > 0
-    || navigator.msMaxTouchPoints > 0;
+  const isTouchDevice = supportsTouch();
 
   let deviceType = 'desktop';
   if (isTouchDevice) {
@@ -132,20 +136,6 @@ export function getDeviceCharacteristics(){
   };
 }
 
-/**
- * Equivalent to CSS vh unit
- */
-export function vh(percentage) {
-  return getViewport().height * percentage / 100;
-}
-
-/**
- * Equivalent to CSS vw unit
- */
-export function vw(percentage) {
-  return getViewport().width * percentage / 100;
-}
-
 export function getViewport() {
   return {
     width: window.innerWidth,
@@ -155,5 +145,20 @@ export function getViewport() {
 
 export function getOrientation() {
   const viewport = getViewport();
-  return viewport.width < viewport.height ? 'portrait' : 'landscape';
+  if (supportsTouch()) {
+    return viewport.width < viewport.height ? 'portrait' : 'landscape';
+  }
+  else {
+    return 'landscape';
+  }
+}
+
+/**
+ * Converts 'vmin' CSS unit into pixels
+ */
+export function vminToPx(value) {
+  const orientation = getOrientation();
+  const viewport = getViewport();
+  const smallestSide = orientation === 'portrait' ? 'width' : 'height';
+  return viewport[smallestSide] * value / 100;
 }

@@ -20,7 +20,7 @@ body, button, kbd {
 
 
   font: var(--landing-font-size)/1em var(--landing-font-family);
-  letter-spacing: var(--landing-letter-spacing);
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
 }
@@ -46,7 +46,7 @@ a:hover {
   position: absolute;
   top: 0;
   left: 0;
-  transform: translate(var(--landing-logo-x), var(--landing-logo-y));
+  transform: translate(var(--landing-logo-left), var(--landing-logo-top));
 
   --logo-cube-padding: calc(var(--landing-logo-cube-size) / 3);
   --logo-cube-block: calc(var(--landing-logo-cube-size) + var(--logo-cube-padding));
@@ -185,7 +185,7 @@ a:hover {
   position: absolute;
   top: 0;
   left: 0;
-  transform: translate(var(--landing-menu-x), var(--landing-menu-y));
+  transform: translate(var(--landing-menu-left), var(--landing-menu-top));
 }
 
 .ongoing-game .menu-desktop {
@@ -205,7 +205,7 @@ a:hover {
   position: relative;
   cursor: pointer;
   padding: 0;
-  margin-bottom: calc(var(--landing-font-size) * 2);
+  margin-bottom: var(--landing-font-size);
   transition: opacity 500ms;
   word-spacing: -0.25em;
 }
@@ -268,8 +268,8 @@ a:hover {
   right: 0;
   transform-origin: right top;
   transform:
-    translateX(var(--position-tetris-translate-x))
-    translateY(var(--position-tetris-translate-y))
+    translateX(var(--position-tetris-translate-right))
+    translateY(var(--position-tetris-translate-top))
     scale(var(--position-tetris-scale))
     rotate(var(--position-tetris-rotation));
   box-shadow: -20px -4px 25px -2px #0009AD;
@@ -277,10 +277,10 @@ a:hover {
 
 .ongoing-game .landing-tetris {
   transform:
-    translateX(var(--position-tetris-ongoing-game-translate-x))
-    translateY(var(--position-tetris-ongoing-game-translate-y))
+    translateX(var(--position-tetris-ongoing-game-translate-right))
+    translateY(var(--position-tetris-ongoing-game-translate-top))
     scale(var(--position-tetris-ongoing-game-scale))
-    rotate(0.5deg);
+    rotate(var(--position-tetris-ongoing-game-rotation));
 }
 
 

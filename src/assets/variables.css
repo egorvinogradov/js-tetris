@@ -1,24 +1,23 @@
 :root {
   --position-tetris-scale: 1;
-  --position-tetris-translate-x: 0;
-  --position-tetris-translate-y: 0;
-  --position-tetris-rotation: 12;
+  --position-tetris-translate-top: 0;
+  --position-tetris-translate-right: 0;
+  --position-tetris-rotation: 12deg;
 
   --position-tetris-ongoing-game-scale: 1;
-  --position-tetris-ongoing-game-translate-x: 0;
-  --position-tetris-ongoing-game-translate-y: 0;
+  --position-tetris-ongoing-game-translate-top: 0;
+  --position-tetris-ongoing-game-translate-right: 0;
+  --position-tetris-ongoing-game-rotation: 0.5deg;
 
   --landing-font-family: 'Press Start', 'Arial', sans-serif;
-  --landing-font-size: 1.652vh;
-  --landing-line-height: 2.102vh;
-  --landing-letter-spacing: 0.15vh;
+  --landing-font-size: 1.65vmin;
 
-  --landing-logo-x: 0;
-  --landing-logo-y: 0;
-  --landing-logo-cube-size: 0.9vh;
+  --landing-logo-top: 7vmin;
+  --landing-logo-left: 7vmin;
+  --landing-logo-cube-size: 1vmin;
 
-  --landing-menu-x: 0;
-  --landing-menu-y: 0;
+  --landing-menu-top: 0;
+  --landing-menu-left: 0;
 
   --landing-color-text: #FFFFFF;
   --landing-color-text-hover: #FF4A00;
@@ -42,4 +41,17 @@
   --tetris-font-family-screen: 'Tetris Screen', monospace;
 
   --tetris-border-radius: 24px;
+}
+
+.device--tablet {
+  --landing-logo-cube-size: 1.2vmin;
+  --landing-font-size: 2.75vmin;
+}
+
+.device--phone {
+  --landing-logo-top: 10vmin;
+  --landing-logo-left: 10vmin;
+  --landing-logo-cube-size: 1.5vmin;
+  --landing-font-size: 3.75vmin;
+  --position-tetris-rotation: 16deg;
 }

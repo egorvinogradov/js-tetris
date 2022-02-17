@@ -12,85 +12,60 @@ import {
   random,
   vw,
   vh,
+  vminToPx,
 } from './utils.js';
 
 
 export class BrickGameLanding {
 
-  OBJECT_POSITIONS_CONFIG = {
+  CONTENT_POSITIONS_CONFIG = {
     phone: {
       portrait: {
-        contentRatio: 0.82,
-        tetrisScaleRation: 0.72,
-        tetrisRotation: 16,
-        tetrisX: 30,
-        tetrisY: 10,
-        menuX: 9.6,
-        menuY: 24,
-        logoX: 9.6,
-        logoY: 10,
-        logoCubeSize: 1.6,
-        fontSize: 3.7,
+        contentRatio: 0.8,
+        tetrisScaleRatio: 0.7,
+        tetrisTopRelative: 10,
+        tetrisRight: 30,
+        menuTop: 25,
+        menuLeft: 10,
       },
       landscape: {
         contentRatio: 2.5,
-        tetrisScaleRation: 1.05,
-        tetrisRotation: 16,
-        tetrisY: 8,
-        menuX: 0,
-        menuY: 34,
-        logoX: 10,
-        logoY: 10,
-        logoCubeSize: 2.2,
-        fontSize: 4.4,
+        tetrisScaleRatio: 1,
+        tetrisTop: 8,
+        menuTop: 35,
+        menuLeftRelative: 0,
       },
     },
     tablet: {
       portrait: {
-        contentRatio: 0.9,
-        tetrisScaleRation: 1,
-        tetrisRotation: 12,
-        tetrisX: 10,
-        tetrisY: 7,
-        menuX: 8,
-        menuY: 20,
-        logoX: 8,
-        logoY: 7,
-        logoCubeSize: 1.2,
-        fontSize: 2.7,
+        contentRatio: 0.95,
+        tetrisScaleRatio: 0.92,
+        tetrisTopRelative: 14,
+        tetrisRight: 10,
+        menuTop: 18,
+        menuLeft: 7,
       },
       landscape: {
         contentRatio: 2.3,
-        tetrisScaleRation: 1.05,
-        tetrisRotation: 12,
-        tetrisY: 4,
-        menuX: 10,
-        menuY: 38,
-        logoX: 6,
-        logoY: 7,
-        logoCubeSize: 1.2,
-        fontSize: 2.7,
+        tetrisScaleRatio: 1,
+        tetrisTop: 7,
+        menuTop: 40,
+        menuLeftRelative: 10,
       },
     },
     desktop: {
       landscape: {
         contentRatio: 2.5,
-        tetrisScaleRation: 1,
-        tetrisRotation: 12,
-        tetrisY: 7,
-        menuX: 0,
-        menuY: 30,
-        logoX: 6,
-        logoY: 7,
-        logoCubeSize: 1,
-        fontSize: 1.65,
+        tetrisScaleRatio: 1,
+        tetrisTop: 7,
+        menuTop: 30,
+        menuLeftRelative: 0,
       },
     },
   };
 
   TETRIS_ORIGINAL_WIDTH = getCSSVariable('--tetris-width', true);
   TETRIS_ORIGINAL_HEIGHT = getCSSVariable('--tetris-height', true);
-  STANDALONE_OFFSET_Y = 20;
 
   CLASSNAME_INITIALIZED = 'initialized';
   CLASSNAME_ONGOING_GAME = 'ongoing-game';
@@ -117,7 +92,8 @@ export class BrickGameLanding {
     this.pwa = new PWA();
 
     this.animateLogo();
-    this.repositionObjects();
+    this.repositionLandingContent();
+    this.repositionLandingContentForOngoingGame();
     this.applyDeviceBasedLogic();
     this.applyVisualEffects();
 
@@ -136,7 +112,10 @@ export class BrickGameLanding {
         screen.orientation.lock('portrait');
       }
       window.addEventListener('orientationchange', () => {
-        this.waitOrientationChangeEnd().then(this.repositionObjects);
+        this.waitOrientationChangeEnd().then(() => {
+          this.repositionLandingContent();
+          this.repositionLandingContentForOngoingGame();
+        });
       });
       addRootClass('device--touch');
     }
@@ -148,7 +127,10 @@ export class BrickGameLanding {
     }
 
     if (!isTouchDevice) {
-      window.addEventListener('resize', this.repositionObjects);
+      window.addEventListener('resize', () => {
+        this.repositionLandingContent();
+        this.repositionLandingContentForOngoingGame();
+      });
     }
   };
 
@@ -233,63 +215,84 @@ export class BrickGameLanding {
     removeRootClass(this.CLASSNAME_ONGOING_GAME);
   };
 
-  repositionObjects = () => {
+  repositionLandingContent = () => {
     const { deviceType } = getDeviceCharacteristics();
     const orientation = getOrientation();
     const viewport = getViewport();
-
-    let config = this.OBJECT_POSITIONS_CONFIG[deviceType][orientation];
-    if (deviceType === 'desktop') {
-      config = this.OBJECT_POSITIONS_CONFIG.desktop.landscape;
-    }
-
-    let tetrisX;
-    let tetrisY;
-    let menuX;
+    const config = this.CONTENT_POSITIONS_CONFIG[deviceType][orientation];
 
     let {
       tetrisWidth,
       tetrisHeight,
       tetrisScale,
-    } = this.calculateTetrisDimensions(config.tetrisScaleRation);
+    } = this.calculateTetrisDimensions(config.tetrisScaleRatio);
 
-    const scalingFunction = orientation === 'portrait' ? vw : vh;
+    let tetrisRight;
+    let tetrisTop;
+    let menuLeft;
+    let menuTop = vminToPx(config.menuTop);
 
     if (orientation === 'portrait') {
-      const contentMarginY = (viewport.height - tetrisHeight * config.contentRatio) / 2;
-      tetrisX = vw(config.tetrisX);
-      tetrisY = Math.max(contentMarginY, vh(config.tetrisY));
-      menuX = vw(config.menuX);
+      const contentMarginY = (viewport.height - (tetrisHeight * config.contentRatio)) / 2;
+      tetrisTop = Math.max(contentMarginY, vminToPx(config.tetrisTopRelative));
+      tetrisRight = vminToPx(config.tetrisRight);
+      menuLeft = vminToPx(config.menuLeft);
     }
     if (orientation === 'landscape') {
-      const contentMarginX = (viewport.width - tetrisWidth * config.contentRatio) / 2;
-      tetrisX = -contentMarginX;
-      tetrisY = vh(config.tetrisY);
-      menuX = contentMarginX + vh(config.menuX);
+      const contentMarginX = (viewport.width - (tetrisWidth * config.contentRatio)) / 2;
+      tetrisTop = vminToPx(config.tetrisTop);
+      tetrisRight = -contentMarginX;
+      menuLeft = contentMarginX + vminToPx(config.menuLeftRelative);
     }
 
-    let menuY = scalingFunction(config.menuY);
-    let logoX = scalingFunction(config.logoX);
-    let logoY = scalingFunction(config.logoY);
-
-    if (this.pwa.isRunningStandalone()) {
-      menuY += this.STANDALONE_OFFSET_Y;
-      logoY += this.STANDALONE_OFFSET_Y;
-    }
-
-    const logoCubeSize =  scalingFunction(config.logoCubeSize);
-    const fontSize = scalingFunction(config.fontSize);
-
-    setCSSVariable('--position-tetris-translate-x', tetrisX, 'px');
-    setCSSVariable('--position-tetris-translate-y', tetrisY, 'px');
     setCSSVariable('--position-tetris-scale', tetrisScale);
-    setCSSVariable('--position-tetris-rotation', config.tetrisRotation, 'deg');
-    setCSSVariable('--landing-menu-x', menuX, 'px');
-    setCSSVariable('--landing-menu-y', menuY, 'px');
-    setCSSVariable('--landing-logo-x', logoX, 'px');
-    setCSSVariable('--landing-logo-y', logoY, 'px');
-    setCSSVariable('--landing-logo-cube-size', logoCubeSize, 'px');
-    setCSSVariable('--landing-font-size', fontSize, 'px');
+    setCSSVariable('--position-tetris-translate-top', tetrisTop, 'px');
+    setCSSVariable('--position-tetris-translate-right', tetrisRight, 'px');
+    setCSSVariable('--landing-menu-top', menuTop, 'px');
+    setCSSVariable('--landing-menu-left', menuLeft, 'px');
+  };
+
+  repositionLandingContentForOngoingGame = () => {
+    // zzz
+
+    const orientation = getOrientation();
+    const viewport = getViewport();
+
+    const TETRIS_ONGOING_GAME_PORTRAIT_SCALE_BY_WIDTH = 0.9;
+    const TETRIS_ONGOING_GAME_LANDSCAPE_SCALE_BY_HEIGHT = 1.5;
+
+    const maxVerticalScale = 0.8;
+
+    const maxTetrisHeightToReachButtons = viewport.height * 0.9;
+    // viewport.height
+
+    const scaleRatio = orientation === 'portrait'
+      ? TETRIS_ONGOING_GAME_PORTRAIT_SCALE_BY_WIDTH
+      : TETRIS_ONGOING_GAME_LANDSCAPE_SCALE_BY_HEIGHT;
+
+    const {
+      tetrisWidth,
+      tetrisHeight,
+      tetrisScale,
+    } = this.calculateTetrisDimensions(scaleRatio, maxTetrisHeightToReachButtons);
+
+    const contentMarginX = (viewport.width - tetrisWidth) / 2;
+    let tetrisOngoingGameX;
+    let tetrisOngoingGameY;
+
+
+    if (orientation === 'portrait') {
+      tetrisOngoingGameX = -contentMarginX;
+      tetrisOngoingGameY = contentMarginX;
+    }
+    if (orientation === 'landscape') {
+      tetrisOngoingGameX = contentMarginX;
+      tetrisOngoingGameY = vminToPx('5vh');
+    }
+
+    setCSSVariable('--position-tetris-ongoing-game-translate-top', tetrisOngoingGameY, 'px');
+    setCSSVariable('--position-tetris-ongoing-game-translate-right', tetrisOngoingGameX, 'px');
+    setCSSVariable('--position-tetris-ongoing-game-scale', tetrisScale);
   };
 
   calculateTetrisDimensions = (ratio) => {
@@ -321,7 +324,7 @@ export class BrickGameLanding {
 
   animateLogo = () => {
     const logoElement = document.querySelector('.logo');
-    const interval = 5000;
+    const frameChangeInterval = 5000;
     let stage = 0;
     setInterval(() => {
       stage = stage > 2 ? 0 : stage + 1;
@@ -331,7 +334,7 @@ export class BrickGameLanding {
       else {
         logoElement.classList.add('logo--frame-' + stage);
       }
-    }, interval);
+    }, frameChangeInterval);
   };
 
   applyVisualEffects = () => {

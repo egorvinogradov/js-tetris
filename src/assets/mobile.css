@@ -33,7 +33,7 @@
   margin: 0;
   left: 0;
   top: 0;
-  transform: translate(var(--landing-menu-x), var(--landing-menu-y));
+  transform: translate(var(--landing-menu-left), var(--landing-menu-top));
 }
 
 .menu-mobile-item {
@@ -47,6 +47,14 @@
   top: 0;
   left: calc(var(--landing-font-size) * -1.5);
 }
+
+@media all and (orientation: portrait) {
+  .device--touch.standalone .logo,
+  .device--touch.standalone .menu-mobile {
+    margin-top: 20px;
+  }
+}
+
 
 
 
