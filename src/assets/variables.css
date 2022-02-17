@@ -43,10 +43,12 @@
   --tetris-border-radius: 24px;
 }
 
+
 .device--tablet {
   --landing-logo-cube-size: 1.2vmin;
   --landing-font-size: 2.75vmin;
 }
+
 
 .device--phone {
   --landing-logo-top: 10vmin;
@@ -54,4 +56,5 @@
   --landing-logo-cube-size: 1.5vmin;
   --landing-font-size: 3.75vmin;
   --position-tetris-rotation: 16deg;
+  --position-tetris-ongoing-game-rotation: 0deg;
 }

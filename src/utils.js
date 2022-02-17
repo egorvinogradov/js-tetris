@@ -108,7 +108,7 @@ export function applySVGFilter(elements, effects) {
   });
 }
 
-export function supportsTouch() {
+export function supportsTouchScreen() {
   return window.ontouchstart
     || navigator.maxTouchPoints > 0
     || navigator.msMaxTouchPoints > 0;
@@ -117,7 +117,7 @@ export function supportsTouch() {
 export function getDeviceCharacteristics(){
   const isIOS = /iPhone|iPod|iPad/i.test(navigator.userAgent);
   const isLateIPadOS = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 2;
-  const isTouchDevice = supportsTouch();
+  const isTouchDevice = supportsTouchScreen();
 
   let deviceType = 'desktop';
   if (isTouchDevice) {
@@ -145,7 +145,7 @@ export function getViewport() {
 
 export function getOrientation() {
   const viewport = getViewport();
-  if (supportsTouch()) {
+  if (supportsTouchScreen()) {
     return viewport.width < viewport.height ? 'portrait' : 'landscape';
   }
   else {

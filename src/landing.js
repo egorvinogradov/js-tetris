@@ -10,8 +10,6 @@ import {
   getOrientation,
   getViewport,
   random,
-  vw,
-  vh,
   vminToPx,
 } from './utils.js';
 
@@ -21,51 +19,54 @@ export class BrickGameLanding {
   CONTENT_POSITIONS_CONFIG = {
     phone: {
       portrait: {
-        contentRatio: 0.8,
-        tetrisScaleRatio: 0.7,
-        tetrisTopRelative: 10,
-        tetrisRight: 30,
-        menuTop: 25,
-        menuLeft: 10,
+        portraitContentRatio: 0.8,
+        portraitTetrisWidth: 70,
+        portraitTetrisTopRelative: 10,
+        portraitTetrisRight: 30,
+        portraitMenuTop: 25,
+        portraitMenuLeft: 10,
       },
       landscape: {
-        contentRatio: 2.5,
-        tetrisScaleRatio: 1,
-        tetrisTop: 8,
-        menuTop: 35,
-        menuLeftRelative: 0,
+        landscapeContentRatio: 2.5,
+        landscapeTetrisHeight: 100,
+        landscapeTetrisTop: 8,
+        landscapeMenuTop: 35,
+        landscapeMenuLeftRelative: 0,
       },
     },
     tablet: {
       portrait: {
-        contentRatio: 0.95,
-        tetrisScaleRatio: 0.92,
-        tetrisTopRelative: 14,
-        tetrisRight: 10,
-        menuTop: 18,
-        menuLeft: 7,
+        portraitContentRatio: 0.95,
+        portraitTetrisHeight: 92,
+        portraitTetrisTopRelative: 14,
+        portraitTetrisRight: 10,
+        portraitMenuTop: 18,
+        portraitMenuLeft: 7,
       },
       landscape: {
-        contentRatio: 2.3,
-        tetrisScaleRatio: 1,
-        tetrisTop: 7,
-        menuTop: 40,
-        menuLeftRelative: 10,
+        landscapeContentRatio: 2.3,
+        landscapeTetrisHeight: 100,
+        landscapeTetrisTop: 7,
+        landscapeMenuTop: 40,
+        landscapeMenuLeftRelative: 10,
       },
     },
     desktop: {
       landscape: {
-        contentRatio: 2.5,
-        tetrisScaleRatio: 1,
-        tetrisTop: 7,
-        menuTop: 30,
-        menuLeftRelative: 0,
+        landscapeContentRatio: 2.5,
+        landscapeTetrisHeight: 100,
+        landscapeTetrisTop: 7,
+        landscapeMenuTop: 30,
+        landscapeMenuLeftRelative: 0,
       },
     },
   };
 
   TETRIS_ORIGINAL_WIDTH = getCSSVariable('--tetris-width', true);
   TETRIS_ORIGINAL_HEIGHT = getCSSVariable('--tetris-height', true);
+
+  TETRIS_MAX_WIDTH_ONGOING_GAME = 95;   // vw
+  TETRIS_MAX_HEIGHT_ONGOING_GAME = 123; // vh
 
   CLASSNAME_INITIALIZED = 'initialized';
   CLASSNAME_ONGOING_GAME = 'ongoing-game';
@@ -221,31 +222,31 @@ export class BrickGameLanding {
     const viewport = getViewport();
     const config = this.CONTENT_POSITIONS_CONFIG[deviceType][orientation];
 
-    let {
-      tetrisWidth,
-      tetrisHeight,
-      tetrisScale,
-    } = this.calculateTetrisDimensions(config.tetrisScaleRatio);
+    let tetrisDimensions = this.scaleTetrisToFit({ vh: config.landscapeTetrisHeight });
+    if (orientation === 'portrait') {
+      tetrisDimensions = deviceType === 'phone'
+        ? this.scaleTetrisToFit({ vw: config.portraitTetrisWidth })
+        : this.scaleTetrisToFit({ vh: config.portraitTetrisHeight });
+    }
 
     let tetrisRight;
     let tetrisTop;
     let menuLeft;
-    let menuTop = vminToPx(config.menuTop);
+    let menuTop = vminToPx(config.portraitMenuTop || config.landscapeMenuTop);
 
     if (orientation === 'portrait') {
-      const contentMarginY = (viewport.height - (tetrisHeight * config.contentRatio)) / 2;
-      tetrisTop = Math.max(contentMarginY, vminToPx(config.tetrisTopRelative));
-      tetrisRight = vminToPx(config.tetrisRight);
-      menuLeft = vminToPx(config.menuLeft);
+      const contentMarginY = (viewport.height - (tetrisDimensions.height * config.portraitContentRatio)) / 2;
+      tetrisTop = Math.max(contentMarginY, vminToPx(config.portraitTetrisTopRelative));
+      tetrisRight = vminToPx(config.portraitTetrisRight);
+      menuLeft = vminToPx(config.portraitMenuLeft);
     }
     if (orientation === 'landscape') {
-      const contentMarginX = (viewport.width - (tetrisWidth * config.contentRatio)) / 2;
-      tetrisTop = vminToPx(config.tetrisTop);
+      const contentMarginX = (viewport.width - (tetrisDimensions.width * config.landscapeContentRatio)) / 2;
+      tetrisTop = vminToPx(config.landscapeTetrisTop);
       tetrisRight = -contentMarginX;
-      menuLeft = contentMarginX + vminToPx(config.menuLeftRelative);
+      menuLeft = contentMarginX + vminToPx(config.landscapeMenuLeftRelative);
     }
-
-    setCSSVariable('--position-tetris-scale', tetrisScale);
+    setCSSVariable('--position-tetris-scale', tetrisDimensions.scale);
     setCSSVariable('--position-tetris-translate-top', tetrisTop, 'px');
     setCSSVariable('--position-tetris-translate-right', tetrisRight, 'px');
     setCSSVariable('--landing-menu-top', menuTop, 'px');
@@ -253,73 +254,57 @@ export class BrickGameLanding {
   };
 
   repositionLandingContentForOngoingGame = () => {
-    // zzz
-
-    const orientation = getOrientation();
     const viewport = getViewport();
+    const tetris = this.scaleTetrisToFit({
+      vw: this.TETRIS_MAX_WIDTH_ONGOING_GAME,
+      vh: this.TETRIS_MAX_HEIGHT_ONGOING_GAME,
+    });
 
-    const TETRIS_ONGOING_GAME_PORTRAIT_SCALE_BY_WIDTH = 0.9;
-    const TETRIS_ONGOING_GAME_LANDSCAPE_SCALE_BY_HEIGHT = 1.5;
+    const contentMarginX = (viewport.width - tetris.width) / 2;
+    const tetrisRight = -contentMarginX;
+    const tetrisTop = Math.min(vminToPx(5), contentMarginX);
 
-    const maxVerticalScale = 0.8;
-
-    const maxTetrisHeightToReachButtons = viewport.height * 0.9;
-    // viewport.height
-
-    const scaleRatio = orientation === 'portrait'
-      ? TETRIS_ONGOING_GAME_PORTRAIT_SCALE_BY_WIDTH
-      : TETRIS_ONGOING_GAME_LANDSCAPE_SCALE_BY_HEIGHT;
-
-    const {
-      tetrisWidth,
-      tetrisHeight,
-      tetrisScale,
-    } = this.calculateTetrisDimensions(scaleRatio, maxTetrisHeightToReachButtons);
-
-    const contentMarginX = (viewport.width - tetrisWidth) / 2;
-    let tetrisOngoingGameX;
-    let tetrisOngoingGameY;
-
-
-    if (orientation === 'portrait') {
-      tetrisOngoingGameX = -contentMarginX;
-      tetrisOngoingGameY = contentMarginX;
-    }
-    if (orientation === 'landscape') {
-      tetrisOngoingGameX = contentMarginX;
-      tetrisOngoingGameY = vminToPx('5vh');
-    }
-
-    setCSSVariable('--position-tetris-ongoing-game-translate-top', tetrisOngoingGameY, 'px');
-    setCSSVariable('--position-tetris-ongoing-game-translate-right', tetrisOngoingGameX, 'px');
-    setCSSVariable('--position-tetris-ongoing-game-scale', tetrisScale);
+    setCSSVariable('--position-tetris-ongoing-game-translate-top', tetrisTop, 'px');
+    setCSSVariable('--position-tetris-ongoing-game-translate-right', tetrisRight, 'px');
+    setCSSVariable('--position-tetris-ongoing-game-scale', tetris.scale);
   };
 
-  calculateTetrisDimensions = (ratio) => {
-    const { deviceType } = this.device;
-    const orientation = getOrientation();
-    const viewport = getViewport();
-    const tetrisWidthToHeightRatio = this.TETRIS_ORIGINAL_WIDTH / this.TETRIS_ORIGINAL_HEIGHT;
+  scaleTetrisToFit = (config) => {
+    const tetrisSizeRatio = this.TETRIS_ORIGINAL_WIDTH / this.TETRIS_ORIGINAL_HEIGHT;
+    const { width: viewportWidth, height: viewportHeight } = getViewport();
+    const maxWidth = viewportWidth * (config.vw || 0) / 100;
+    const maxHeight = viewportHeight * (config.vh || 0) / 100;
 
-    let tetrisWidth;
-    let tetrisHeight;
-    let tetrisScale;
-
-    if (deviceType === 'phone' && orientation === 'portrait') {
-      tetrisWidth = viewport.width * ratio;
-      tetrisHeight = tetrisWidth / tetrisWidthToHeightRatio;
-      tetrisScale = tetrisWidth / this.TETRIS_ORIGINAL_WIDTH;
-    }
-    else {
-      tetrisHeight = viewport.height * ratio;
-      tetrisWidth = tetrisHeight * tetrisWidthToHeightRatio;
-      tetrisScale = tetrisHeight / this.TETRIS_ORIGINAL_HEIGHT;
-    }
-    return {
-      tetrisHeight,
-      tetrisWidth,
-      tetrisScale,
+    const fitIntoWidth = (maxWidth) => {
+      return {
+        width: maxWidth,
+        height: maxWidth / tetrisSizeRatio,
+        scale: maxWidth / this.TETRIS_ORIGINAL_WIDTH,
+      };
     };
+    const fitIntoHeight = (maxHeight) => {
+      return {
+        height: maxHeight,
+        width: maxHeight * tetrisSizeRatio,
+        scale: maxHeight / this.TETRIS_ORIGINAL_HEIGHT,
+      };
+    };
+
+    if (maxWidth && maxHeight) {
+      const maxSizeRatio = maxWidth / maxHeight;
+      if (maxSizeRatio < tetrisSizeRatio) {
+        return fitIntoWidth(maxWidth);
+      }
+      else {
+        return fitIntoHeight(maxHeight);
+      }
+    }
+    else if (maxWidth) {
+      return fitIntoWidth(maxWidth);
+    }
+    else if (maxHeight) {
+      return fitIntoHeight(maxHeight);
+    }
   };
 
   animateLogo = () => {

@@ -335,6 +335,39 @@ a:hover {
 
 
 
+
+/* PWA INSTALLATION */
+
+.pwa-install-button {
+  position: fixed;
+  bottom: var(--landing-font-size);
+  left: var(--landing-font-size);
+  z-index: 1;
+  border: 0;
+  background: var(--landing-color-text);
+  color: #000000;
+  padding:
+    var(--landing-font-size)
+    var(--landing-font-size)
+    calc(var(--landing-font-size) * 0.8)
+    var(--landing-font-size);
+  white-space: nowrap;
+  word-spacing: calc(var(--landing-font-size) * -0.4);
+}
+
+.pwa-install-button:first-letter {
+  color: var(--landing-color-text-hover);
+  font-size: 105%;
+}
+
+.ongoing-game .pwa-install-button,
+.standalone .pwa-install-button {
+  display: none;
+}
+
+
+
+
 /* INITIALIZING */
 
 .logo,
@@ -347,7 +380,8 @@ a:hover {
 
 .initialized .logo,
 .initialized .credits,
-.initialized .menu,
+.initialized .menu-desktop,
+.initialized .menu-mobile,
 .initialized .landing-tetris {
   opacity: 1;
 }
