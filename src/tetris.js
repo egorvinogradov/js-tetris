@@ -98,7 +98,7 @@ export class Tetris {
     }
   };
 
-  canPlay = () => {
+  isPlaying = () => {
     return this.isOngoingGame && !this.isPaused;
   };
 
@@ -127,10 +127,13 @@ export class Tetris {
   };
 
   quitGame = () => {
-    this.stopOngoingGame();
-    this.gameScreen.reset();
-    this.demoScene.launchScreenSaver();
-    this.triggerEvent(TETRIS_EVENTS.QUIT);
+    const confirmationMessage = 'Are you sure you want to quit?';
+    if (this.isOngoingGame && confirm(confirmationMessage)) {
+      this.stopOngoingGame();
+      this.gameScreen.reset();
+      this.demoScene.launchScreenSaver();
+      this.triggerEvent(TETRIS_EVENTS.QUIT);
+    }
   };
 
   stopOngoingGame = () => {
@@ -163,10 +166,10 @@ export class Tetris {
         action();
       }
     });
-    document.querySelector('.button-rotate .button-knob').addEventListener('click', actions.ArrowUp);
-    document.querySelector('.button-top-pause .button-knob').addEventListener('click', actions.KeyP);
-    document.querySelector('.button-top-quit .button-knob').addEventListener('click', actions.Escape);
-    document.querySelector('.button-top-mute .button-knob').addEventListener('click', actions.KeyM);
+    this.onButtonTap('.button-rotate', actions.ArrowUp);
+    this.onButtonTap('.button-top-pause', actions.KeyP);
+    this.onButtonTap('.button-top-quit', actions.Escape);
+    this.onButtonTap('.button-top-mute', actions.KeyM);
   };
 
   enableMovementKeys = () => {
@@ -187,22 +190,36 @@ export class Tetris {
     });
   };
 
-  enableMovementButton = (selector) => {
-    const element = document.querySelector(selector);
-    const keyCode = element.dataset.key;
+  onButtonTap = (selector, callback) => {
+    const eventType = 'onpointerdown' in window
+      ? 'pointerdown'
+      : 'touchstart';
+    document.querySelector(selector).addEventListener(eventType, e => {
+      this.vibrate('buttonPressed');
+      callback(e);
+    });
+  };
 
-    // TODO: rewrite using Pointer Events API
-    // TODO: use preventDefault to prevent iOS from selecting text on long tap
-    element.querySelector('.button-knob').addEventListener('mousedown', () => {
+  onButtonUntap = (selector, callback) => {
+    const eventType = 'onpointerup' in window
+      ? 'pointerup'
+      : 'touchend';
+    document.querySelector(selector).addEventListener(eventType, callback);
+  };
+
+  enableMovementButton = (selector) => {
+    const keyCode = document.querySelector(selector).dataset.key;
+
+    this.onButtonTap(selector, () => {
       this.onMovementStart(keyCode);
     });
-    element.querySelector('.button-knob').addEventListener('mouseup', () => {
+    this.onButtonUntap(selector, () => {
       this.onMovementCancel(keyCode);
     });
   };
 
   onMovementStart = (key) => {
-    if (!this.canPlay()) {
+    if (!this.isPlaying()) {
       return;
     }
 
@@ -225,14 +242,14 @@ export class Tetris {
         speedIncreaseTimeout,
         movementTimeout: null, // movementTimeout is being set in this.moveCurrentFigureRecursively
       };
+
       const delta = this.getMovementDelta(key);
       this.moveCurrentFigureRecursively(key, delta);
-      this.sound.figureMoved();
     }
   };
 
   onMovementCancel = (key) => {
-    if (!this.canPlay()) {
+    if (!this.isPlaying()) {
       return;
     }
     clearTimeout(this.figureMovements[key].movementTimeout);
@@ -250,9 +267,12 @@ export class Tetris {
   };
 
   moveCurrentFigureRecursively = (key, delta, hasEnteredRecursion) => {
+    this.sound.figureMoved();
+
     if (!hasEnteredRecursion) {
       this.attemptMovingCurrentFigure(delta);
     }
+
     this.figureMovements[key].movementTimeout = setTimeout(() => {
       const didMove = this.attemptMovingCurrentFigure(delta);
       if (didMove) {
@@ -260,6 +280,7 @@ export class Tetris {
       }
       else if (key === 'ArrowDown') {
         this.stackCurrentFigureOntoCanvas();
+        this.vibrate('figureDropped');
         this.sound.figureDropped();
       }
     }, this.figureMovements[key].currentSpeed);
@@ -345,7 +366,7 @@ export class Tetris {
   };
 
   rotateCurrentFigure = () => {
-    if (this.canPlay() && this.currentFigure.canRotate()) {
+    if (this.isPlaying() && this.currentFigure.canRotate()) {
       this.currentFigure.rotate();
       this.gameScreen.render(this.currentFigure);
       this.sound.figureRotated();
@@ -383,10 +404,22 @@ export class Tetris {
     this.stopOngoingGame();
     this.triggerEvent(TETRIS_EVENTS.FAIL);
     this.sound.gameOver();
+    this.vibrate('gameOver');
 
     this.demoScene.showGameOverScreen().then(() => {
       this.triggerEvent(TETRIS_EVENTS.QUIT);
       this.demoScene.launchScreenSaver();
     });
+  };
+
+  vibrate = (type) => {
+    const vibrationPatterns = {
+      gameOver: [1000],
+      buttonPressed: [200],
+      figureDropped: [400],
+    };
+    if (navigator.vibrate && vibrationPatterns[type]) {
+      navigator.vibrate(vibrationPatterns[type]);
+    }
   };
 }

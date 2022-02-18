@@ -172,10 +172,12 @@ export class BrickGameLanding {
      * @see https://stackoverflow.com/questions/46167604/ios-html-disable-double-tap-to-zoom
      */
     let lastTouchEnd = 0;
-    const doubleTabDelay = 300; // see: https://stackoverflow.com/a/38958743
+    const doubleTapDelay = 300; // https://stackoverflow.com/a/38958743
     document.addEventListener('touchend', (e) => {
-      let now = +new Date();
-      if (now - lastTouchEnd <= doubleTabDelay) {
+      const now = +new Date();
+      const isWithinDelay = now - lastTouchEnd <= doubleTapDelay;
+      const isWithinButton = e.target.closest('.button');
+      if (isWithinDelay && !isWithinButton) {
         e.preventDefault();
       }
       lastTouchEnd = now;
