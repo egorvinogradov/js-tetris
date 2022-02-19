@@ -198,7 +198,9 @@ export class BrickGameLanding {
     this.tetris.on(TETRIS_EVENTS.PLAY_PAUSE, isPaused => {
       isPaused ? addRootClass(this.CLASSNAME_PAUSED) : removeRootClass(this.CLASSNAME_PAUSED);
     });
-    this.tetris.on(TETRIS_EVENTS.FAIL, () => {
+    this.tetris.on(TETRIS_EVENTS.GAME_OVER, notification => {
+      const { title, body } = notification;
+      this.pwa.showNotification(title, body);
       addRootClass(this.CLASSNAME_GAME_OVER);
     });
     this.tetris.on(TETRIS_EVENTS.QUIT, this.resetTetrisClassnames);

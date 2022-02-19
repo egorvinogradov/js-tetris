@@ -16,9 +16,9 @@ export class PWA {
     }
 
     // TODO: uncomment after debug
-    // if (navigator.serviceWorker && !localStorage['debug']) {
-    //   this.registerServiceWorker();
-    // }
+    if (navigator.serviceWorker && !localStorage['debug']) {
+      this.registerServiceWorker();
+    }
 
     this.detectStandalone();
     this.renderIOSSplashScreen();
@@ -140,7 +140,7 @@ export class PWA {
       });
     }
     for (let key in localStorage) {
-      if (key !== 'debug') {
+      if (key !== 'debug' && key !== 'history') {
         localStorage.removeItem(key);
       }
     }
@@ -168,6 +168,16 @@ export class PWA {
     catch (e) {}
     if (isStandaloneIOS || isStandaloneChrome) {
       addRootClass('standalone');
+    }
+  };
+
+  showNotification = (title, body) => {
+    if (navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        eventType: 'notification',
+        title,
+        body,
+      });
     }
   };
 }

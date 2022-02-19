@@ -2,13 +2,19 @@ import { Matrix } from './matrix.js';
 import { Figure } from './figure.js';
 import { Sound } from './sound.js';
 import { DemoScene } from './demoscene.js';
+import {
+  formatNumber,
+  getDeviceCharacteristics,
+  numberToHumanReadableOrder,
+  timestampToHumanReadableDuration,
+} from './utils.js';
 
 
 export const TETRIS_EVENTS = {
   NEW_GAME: 'NEW_GAME',
   PLAY_PAUSE: 'PLAY_PAUSE',
   QUIT: 'QUIT',
-  FAIL: 'FAIL',
+  GAME_OVER: 'GAME_OVER',
 };
 
 
@@ -16,6 +22,8 @@ export class Tetris {
 
   SPEED_DESCEND = 1000;
   SPEED_DESCEND_REDUCTION_BY_LEVEL = 100;
+  SPEED_LIMIT_DESKTOP = 200;
+  SPEED_LIMIT_MOBILE = 300;
 
   SPEED_X_MOVEMENT = 100;
   SPEED_X_MOVEMENT_SPED_UP = 100;
@@ -28,6 +36,7 @@ export class Tetris {
   level = 1;
   score = 0;
   rowsCleared = 0;
+  currentGameStartedAt = null;
 
   events = {};
   descendInterval = null;
@@ -113,6 +122,8 @@ export class Tetris {
       this.sound.startBackgroundNoise();
       this.sound.intro();
 
+      this.currentGameStartedAt = +new Date();
+
       this.spawnNewCurrentFigure();
       this.dropCurrentFigure();
       this.triggerEvent(TETRIS_EVENTS.NEW_GAME);
@@ -130,6 +141,7 @@ export class Tetris {
     const confirmationMessage = 'Are you sure you want to quit?';
     if (this.isOngoingGame && confirm(confirmationMessage)) {
       this.stopOngoingGame();
+      this.changeScore({ type: 'reset' });
       this.gameScreen.reset();
       this.demoScene.launchScreenSaver();
       this.triggerEvent(TETRIS_EVENTS.QUIT);
@@ -148,7 +160,6 @@ export class Tetris {
 
     this.nextFigureScreen.reset();
     this.nextFigureScreen.render();
-    this.changeScore({ type: 'reset' });
   };
 
   enableGeneralKeys = () => {
@@ -325,7 +336,12 @@ export class Tetris {
   };
 
   getDescendSpeed = () => {
-    return this.SPEED_DESCEND - ((this.level - 1) * this.SPEED_DESCEND_REDUCTION_BY_LEVEL);
+    const { deviceType } = getDeviceCharacteristics();
+    const speed = this.SPEED_DESCEND - ((this.level - 1) * this.SPEED_DESCEND_REDUCTION_BY_LEVEL);
+    const speedLimit = deviceType === 'desktop'
+      ? this.SPEED_LIMIT_DESKTOP
+      : this.SPEED_LIMIT_MOBILE;
+    return Math.max(speed, speedLimit);
   };
 
   dropCurrentFigure = () => {
@@ -344,7 +360,7 @@ export class Tetris {
       }, this.getDescendSpeed());
     }
     else {
-      this.onGameFailed();
+      this.onGameOver();
     }
   };
 
@@ -394,22 +410,100 @@ export class Tetris {
       this.score = 0;
       this.rowsCleared = 0;
       this.level = 1;
+      this.currentGameStartedAt = null;
     }
     const displayedScore = Math.min(this.score, 9999999).toString().padStart(7, '0');
     document.querySelector('.screen-counter--score').innerText = displayedScore;
     document.querySelector('.screen-counter--level').innerText = this.level;
   };
 
-  onGameFailed = () => {
+  onGameOver = () => {
     this.stopOngoingGame();
-    this.triggerEvent(TETRIS_EVENTS.FAIL);
+
+    const results = {
+      score: this.score,
+      level: this.level,
+      rowsCleared: this.rowsCleared,
+    };
+    this.saveScoreToHistory(results, this.currentGameStartedAt).then(item => {
+      const notification = this.generateGameOverNotification(item);
+      this.triggerEvent(TETRIS_EVENTS.GAME_OVER, notification);
+    });
+
     this.sound.gameOver();
     this.vibrate('gameOver');
 
     this.demoScene.showGameOverScreen().then(() => {
+      this.changeScore({ type: 'reset' });
       this.triggerEvent(TETRIS_EVENTS.QUIT);
       this.demoScene.launchScreenSaver();
     });
+  };
+
+  getScoreHistory = () => {
+    const history = JSON.parse(localStorage.getItem('scores')) || {};
+    if (!history.highest) {
+      history.highest = {};
+    }
+    if (!history.items?.length) {
+      history.items = [];
+    }
+    return history;
+  };
+
+  saveScoreToHistory = (results, gameStartedAt) => {
+    const history = this.getScoreHistory();
+    const timestamp = +new Date();
+    const duration = timestamp - gameStartedAt;
+
+    const isHighest = {
+      score: false,
+      rowsCleared: false,
+      level: false,
+    };
+    for (let type in isHighest) {
+      if (results[type] > (history['highest'][type] || 0)) {
+        history['highest'][type] = results[type];
+        isHighest[type] = true;
+      }
+    }
+    const item = {
+      timestamp,
+      duration,
+      isHighest,
+      results,
+    };
+
+    history['items'].push(item);
+    localStorage.setItem('scores', JSON.stringify(history));
+
+    return new Promise(resolve => {
+      resolve(item);
+    });
+  };
+
+  generateGameOverNotification = (item) => {
+    const { results, isHighest, duration } = item;
+    const scoreStr = formatNumber(results.score);
+    const levelStr = numberToHumanReadableOrder(results.level);
+    const durationStr = timestampToHumanReadableDuration(duration);
+
+    let title = `Scored ${scoreStr} points`;
+    let body = `${results.rowsCleared} lines cleared, reached ${levelStr} level.`;
+
+    if (isHighest.rowsCleared || isHighest.level) {
+      title = isHighest.rowsCleared
+        ? `RECORD! ${results.rowsCleared} lines cleared`
+        : `RECORD! ${levelStr} level reached`;
+      body = `Scored ${scoreStr} points${isHighest.score ? ' (highest of all time).' : '.'}`;
+    }
+    else if (isHighest.score) {
+      title = `RECORD! ${scoreStr} points earned`;
+    }
+
+    body += ` Completed in ${durationStr}.`;
+
+    return { title, body };
   };
 
   vibrate = (type) => {

@@ -162,3 +162,41 @@ export function vminToPx(value) {
   const smallestSide = orientation === 'portrait' ? 'width' : 'height';
   return viewport[smallestSide] * value / 100;
 }
+
+export function formatNumber(number) {
+  try {
+    return new Intl.NumberFormat().format(number);
+  }
+  catch (e) {
+    return number;
+  }
+}
+
+export function numberToHumanReadableOrder(number) {
+  const endings = {
+    '1': 'st',
+    '2': 'nd',
+    '3': 'rd',
+  };
+  return number + (endings[number] || 'th');
+}
+
+export function timestampToHumanReadableDuration(timestamp) {
+  const secondsTotal = Math.round(timestamp / 1000);
+  const minutesTotal = Math.floor(secondsTotal / 60);
+  const hoursTotal = Math.floor(minutesTotal / 60);
+
+  const minutes = minutesTotal - (hoursTotal * 60);
+  const seconds = secondsTotal - (hoursTotal * 60 * 60) - (minutes * 60);
+
+  const chunk = (count, word) => {
+    return count
+      ? `${count} ${word}${count === 1 ? ' ' : 's '}`
+      : '';
+  };
+  return [
+    chunk(hoursTotal, 'hour'),
+    chunk(minutes, 'minute'),
+    chunk(seconds, 'second'),
+  ].join(' ').trim();
+}

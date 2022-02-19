@@ -13,7 +13,18 @@ self.addEventListener('fetch', async (event) => {
   event.respondWith(handleRequest(event.request));
 });
 
-async function saveAppToCache(){
+self.addEventListener('message', event => {
+  const { eventType, title, body } = event.data;
+  if (eventType === 'notification') {
+    showNotification(title, body);
+  }
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+});
+
+function saveAppToCache(){
   return fetch('/service_worker_assets.txt').then(response => {
     return response.text().then(filelist => {
       const assetURLs = filelist
@@ -43,4 +54,28 @@ async function handleRequest(request){
       return response.clone();
     });
   }
+}
+
+function searchCacheByUrl(url) {
+  return caches.open(VERSION)
+    .then(cache => cache.keys())
+    .then(keys => {
+      for (let index in keys) {
+        if (keys[index].url.includes(url)) {
+          return keys[index].url;
+        }
+      }
+      return null;
+    });
+}
+
+function showNotification(title, body){
+  searchCacheByUrl('/icon-android-192').then(icon => {
+    self.registration.showNotification(title, {
+      body,
+      icon,
+      tag: 'scores',
+      requireInteraction: true,
+    });
+  });
 }
