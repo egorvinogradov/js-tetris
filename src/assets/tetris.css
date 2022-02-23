@@ -781,6 +781,7 @@
 .button-knob {
   pointer-events: none;
   position: relative;
+  cursor: pointer;
   width: 26px;
   height: 26px;
   border-radius: 100%;

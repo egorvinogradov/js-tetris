@@ -1,8 +1,8 @@
-import { addRootClass } from './utils.js';
+import { addRootClass, getCSSVariable } from './utils.js';
 
 export class PWA {
 
-  IOS_SPLASH_SCREEN_BACKGROUND = '#0033FF';
+  IOS_SPLASH_SCREEN_BACKGROUND = getCSSVariable('--landing-color-background');
 
   PROMPT_DISMISSAL_MAX_ATTEMPTS = 3;
   PROMPT_DISMISSAL_EXPIRATION_PERIOD = 5 * 24 * 60 * 60 * 100; // 5 days
@@ -14,9 +14,7 @@ export class PWA {
       this.reset();
       console.warn('SERVICE WORKER DISABLED');
     }
-
-    // TODO: uncomment after debug
-    if (navigator.serviceWorker && !localStorage['debug']) {
+    else if (navigator.serviceWorker) {
       this.registerServiceWorker();
     }
 
@@ -172,12 +170,14 @@ export class PWA {
   };
 
   showNotification = (title, body) => {
-    if (navigator.serviceWorker?.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        eventType: 'notification',
-        title,
-        body,
-      });
-    }
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted' && navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          eventType: 'notification',
+          title,
+          body,
+        });
+      }
+    });
   };
 }

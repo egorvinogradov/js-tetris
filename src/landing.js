@@ -90,19 +90,27 @@ export class BrickGameLanding {
   device = getDeviceCharacteristics();
 
   constructor(){
-    this.pwa = new PWA();
-
+    this.redirectToHttps();
     this.animateLogo();
     this.repositionLandingContent();
     this.repositionLandingContentForOngoingGame();
     this.applyDeviceBasedLogic();
     this.applyVisualEffects();
 
+    this.pwa = new PWA();
+
     // TODO: move to settings, change appearance, optimize code
     // document.querySelector('.options-reset-pwa').addEventListener('click', this.pwa.reset);
 
     window.addEventListener('load', this.initializeTetris);
   }
+
+  redirectToHttps = () => {
+    const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!isDevelopment && location.protocol === 'http:') {
+      location.protocol = 'https:';
+    }
+  };
 
   applyDeviceBasedLogic = () => {
     const { deviceType, isTouchDevice, isIOS } = this.device;
@@ -328,7 +336,7 @@ export class BrickGameLanding {
 
   applyVisualEffects = () => {
     applySVGFilter(document.querySelector('.noise'), [
-      { type: 'turbulence', baseFrequency: 1 }
+      { type: 'turbulence', baseFrequency: 0.7 }
     ]);
     applySVGFilter(document.querySelector('.brand-image'), [
       { type: 'composite', operator: 'in', result: 'composite', inSource: true, in2Source: true },

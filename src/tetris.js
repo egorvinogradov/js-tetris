@@ -4,6 +4,7 @@ import { Sound } from './sound.js';
 import { DemoScene } from './demoscene.js';
 import {
   formatNumber,
+  inflectByNumber,
   getDeviceCharacteristics,
   numberToHumanReadableOrder,
   timestampToHumanReadableDuration,
@@ -122,6 +123,7 @@ export class Tetris {
       this.sound.startBackgroundNoise();
       this.sound.intro();
 
+      this.changeScore({ type: 'reset' });
       this.currentGameStartedAt = +new Date();
 
       this.spawnNewCurrentFigure();
@@ -139,7 +141,12 @@ export class Tetris {
 
   quitGame = () => {
     const confirmationMessage = 'Are you sure you want to quit?';
-    if (this.isOngoingGame && confirm(confirmationMessage)) {
+    const moreThan10SecondsHasPassed = new Date() - this.currentGameStartedAt > 10 * 1000;
+
+    if (this.isOngoingGame) {
+      if (moreThan10SecondsHasPassed && !confirm(confirmationMessage)) {
+        return;
+      }
       this.stopOngoingGame();
       this.changeScore({ type: 'reset' });
       this.gameScreen.reset();
@@ -441,7 +448,7 @@ export class Tetris {
   };
 
   getScoreHistory = () => {
-    const history = JSON.parse(localStorage.getItem('scores')) || {};
+    const history = JSON.parse(localStorage.getItem('history')) || {};
     if (!history.highest) {
       history.highest = {};
     }
@@ -475,7 +482,7 @@ export class Tetris {
     };
 
     history['items'].push(item);
-    localStorage.setItem('scores', JSON.stringify(history));
+    localStorage.setItem('history', JSON.stringify(history));
 
     return new Promise(resolve => {
       resolve(item);
@@ -484,25 +491,25 @@ export class Tetris {
 
   generateGameOverNotification = (item) => {
     const { results, isHighest, duration } = item;
-    const scoreStr = formatNumber(results.score);
-    const levelStr = numberToHumanReadableOrder(results.level);
+    const pointsStr = formatNumber(results.score) + ' points';
+    const levelStr = numberToHumanReadableOrder(results.level) + ' level';
+    const rowsStr = inflectByNumber(results.rowsCleared, 'line');
     const durationStr = timestampToHumanReadableDuration(duration);
 
-    let title = `Scored ${scoreStr} points`;
-    let body = `${results.rowsCleared} lines cleared, reached ${levelStr} level.`;
+    let title = `Scored ${pointsStr}`;
+    let body = `${rowsStr} cleared, reached ${levelStr}.`;
 
     if (isHighest.rowsCleared || isHighest.level) {
       title = isHighest.rowsCleared
-        ? `RECORD! ${results.rowsCleared} lines cleared`
-        : `RECORD! ${levelStr} level reached`;
-      body = `Scored ${scoreStr} points${isHighest.score ? ' (highest of all time).' : '.'}`;
+        ? `RECORD🔥 ${rowsStr} cleared`
+        : `RECORD🔥 ${levelStr} reached`;
+      body = `Scored ${pointsStr}${isHighest.score ? ' (highest of all time).' : '.'}`;
     }
     else if (isHighest.score) {
-      title = `RECORD! ${scoreStr} points earned`;
+      title = `RECORD🔥 ${pointsStr} earned`;
     }
 
     body += ` Completed in ${durationStr}.`;
-
     return { title, body };
   };
 

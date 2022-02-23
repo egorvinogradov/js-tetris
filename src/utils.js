@@ -188,15 +188,15 @@ export function timestampToHumanReadableDuration(timestamp) {
 
   const minutes = minutesTotal - (hoursTotal * 60);
   const seconds = secondsTotal - (hoursTotal * 60 * 60) - (minutes * 60);
+  const chunk = (count, word) => count ? inflectByNumber(count, word) : '';
 
-  const chunk = (count, word) => {
-    return count
-      ? `${count} ${word}${count === 1 ? ' ' : 's '}`
-      : '';
-  };
   return [
     chunk(hoursTotal, 'hour'),
     chunk(minutes, 'minute'),
     chunk(seconds, 'second'),
   ].join(' ').trim();
+}
+
+export function inflectByNumber(number, word){
+  return `${number} ${word}${number === 1 ? '' : 's'}`;
 }

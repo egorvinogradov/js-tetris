@@ -40,20 +40,25 @@ function saveAppToCache(){
 }
 
 async function handleRequest(request){
-  const { pathname } = new URL(request.url);
-  const cacheMatch = pathname === '/' ? '/index.html' : request;
-  const cachedEntry = await caches.match(cacheMatch);
+  const { hostname, pathname } = new URL(request.url);
+  const isDevelopment = hostname === 'localhost' || hostname === '127.0.0.1';
+
+  let cachedEntry;
+  let cacheMatch;
+
+  if (!isDevelopment) {
+    cacheMatch = pathname === '/' ? '/index.html' : request;
+    cachedEntry = await caches.match(cacheMatch);
+  }
   if (cachedEntry) {
     return cachedEntry;
   }
-  else {
-    return fetch(request).then(response => {
-      caches.open(VERSION).then(cache => {
-        cache.put(request, response);
-      });
-      return response.clone();
+  return fetch(request).then(response => {
+    caches.open(VERSION).then(cache => {
+      cache.put(request, response);
     });
-  }
+    return response.clone();
+  });
 }
 
 function searchCacheByUrl(url) {
