@@ -42,6 +42,7 @@ export class Tetris {
   events = {};
   descendInterval = null;
   figureMovements = {};
+  isMovementKeyDown = {};
 
   isOngoingGame = false;
   isPaused = false;
@@ -90,9 +91,6 @@ export class Tetris {
 
     this.enableGeneralKeys();
     this.enableMovementKeys();
-    this.enableMovementButton('.button-left');
-    this.enableMovementButton('.button-right');
-    this.enableMovementButton('.button-down');
   }
 
   on = (eventName, callback) => {
@@ -127,7 +125,7 @@ export class Tetris {
       this.currentGameStartedAt = +new Date();
 
       this.spawnNewCurrentFigure();
-      this.dropCurrentFigure();
+      this.descendCurrentFigure();
       this.triggerEvent(TETRIS_EVENTS.NEW_GAME);
     }
   };
@@ -163,7 +161,6 @@ export class Tetris {
     this.isPaused = false;
 
     clearInterval(this.descendInterval);
-    this.descendInterval = null;
 
     this.nextFigureScreen.reset();
     this.nextFigureScreen.render();
@@ -171,11 +168,11 @@ export class Tetris {
 
   enableGeneralKeys = () => {
     const actions = {
-      'Enter': this.launchNewGame,
-      'Escape': this.quitGame,
       'ArrowUp': this.rotateCurrentFigure,
-      'KeyP': this.pauseOrResumeGame,
       'KeyM': this.sound.toggleMute,
+      'KeyP': this.pauseOrResumeGame,
+      'Escape': this.quitGame,
+      'Enter': this.launchNewGame,
     };
     document.addEventListener('keydown', e => {
       const key = e.code;
@@ -184,10 +181,10 @@ export class Tetris {
         action();
       }
     });
-    this.onButtonTap('.button-rotate', actions.ArrowUp);
-    this.onButtonTap('.button-top-pause', actions.KeyP);
-    this.onButtonTap('.button-top-quit', actions.Escape);
-    this.onButtonTap('.button-top-mute', actions.KeyM);
+    this.onTouchButtonPress('.button-rotate', actions.ArrowUp);
+    this.onTouchButtonPress('.button-top-mute', actions.KeyM);
+    this.onTouchButtonPress('.button-top-pause', actions.KeyP);
+    this.onTouchButtonPress('.button-top-quit', actions.Escape);
   };
 
   enableMovementKeys = () => {
@@ -197,18 +194,25 @@ export class Tetris {
       'ArrowDown',
     ];
     document.addEventListener('keydown', e => {
-      if (keys.includes(e.code)) {
-        this.onMovementStart(e.code);
+      const { code } = e;
+      if (keys.includes(code) && !this.isMovementKeyDown[code]) {
+        this.isMovementKeyDown[code] = true;
+        this.startCurrentFigureMovementOnButtonPress(code);
       }
     });
     document.addEventListener('keyup', e => {
-      if (keys.includes(e.code)) {
-        this.onMovementCancel(e.code);
+      const { code } = e;
+      if (keys.includes(code) && this.isMovementKeyDown[code]) {
+        delete this.isMovementKeyDown[code];
+        this.cancelCurrentFigureMovementOnButtonPress(code);
       }
     });
+    this.enableTouchMovementButton('.button-left');
+    this.enableTouchMovementButton('.button-right');
+    this.enableTouchMovementButton('.button-down');
   };
 
-  onButtonTap = (selector, callback) => {
+  onTouchButtonPress = (selector, callback) => {
     const eventType = 'onpointerdown' in window
       ? 'pointerdown'
       : 'touchstart';
@@ -218,25 +222,25 @@ export class Tetris {
     });
   };
 
-  onButtonUntap = (selector, callback) => {
+  onTouchButtonRelease = (selector, callback) => {
     const eventType = 'onpointerup' in window
       ? 'pointerup'
       : 'touchend';
     document.querySelector(selector).addEventListener(eventType, callback);
   };
 
-  enableMovementButton = (selector) => {
+  enableTouchMovementButton = (selector) => {
     const keyCode = document.querySelector(selector).dataset.key;
 
-    this.onButtonTap(selector, () => {
-      this.onMovementStart(keyCode);
+    this.onTouchButtonPress(selector, () => {
+      this.startCurrentFigureMovementOnButtonPress(keyCode);
     });
-    this.onButtonUntap(selector, () => {
-      this.onMovementCancel(keyCode);
+    this.onTouchButtonRelease(selector, () => {
+      this.cancelCurrentFigureMovementOnButtonPress(keyCode);
     });
   };
 
-  onMovementStart = (key) => {
+  startCurrentFigureMovementOnButtonPress = (key) => {
     if (!this.isPlaying()) {
       return;
     }
@@ -261,18 +265,24 @@ export class Tetris {
         movementTimeout: null, // movementTimeout is being set in this.moveCurrentFigureRecursively
       };
 
-      const delta = this.getMovementDelta(key);
-      this.moveCurrentFigureRecursively(key, delta);
+      this.moveCurrentFigureRecursively(key);
     }
   };
 
-  onMovementCancel = (key) => {
+  cancelCurrentFigureMovementOnButtonPress = (key) => {
     if (!this.isPlaying()) {
       return;
     }
     clearTimeout(this.figureMovements[key].movementTimeout);
     clearTimeout(this.figureMovements[key].speedIncreaseTimeout);
     delete this.figureMovements[key];
+  };
+
+  clearAllCurrentFigureMovementTimeouts = () => {
+    for (let key in this.figureMovements) {
+      clearTimeout(this.figureMovements[key].movementTimeout);
+      clearTimeout(this.figureMovements[key].speedIncreaseTimeout);
+    }
   };
 
   attemptMovingCurrentFigure = (delta) => {
@@ -284,7 +294,9 @@ export class Tetris {
     return false;
   };
 
-  moveCurrentFigureRecursively = (key, delta, hasEnteredRecursion) => {
+  moveCurrentFigureRecursively = (key, hasEnteredRecursion) => {
+
+    const delta = this.getMovementDelta(key);
     this.sound.figureMoved();
 
     if (!hasEnteredRecursion) {
@@ -294,7 +306,7 @@ export class Tetris {
     this.figureMovements[key].movementTimeout = setTimeout(() => {
       const didMove = this.attemptMovingCurrentFigure(delta);
       if (didMove) {
-        this.moveCurrentFigureRecursively(key, delta, true);
+        this.moveCurrentFigureRecursively(key, true);
       }
       else if (key === 'ArrowDown') {
         this.stackCurrentFigureOntoCanvas();
@@ -351,7 +363,7 @@ export class Tetris {
     return Math.max(speed, speedLimit);
   };
 
-  dropCurrentFigure = () => {
+  descendCurrentFigure = () => {
     if (this.currentFigure.fitsIntoMatrix()) {
       this.descendInterval = setInterval(() => {
         if (this.isPaused) {
@@ -371,8 +383,11 @@ export class Tetris {
     }
   };
 
+
+
   stackCurrentFigureOntoCanvas = () => {
     clearInterval(this.descendInterval);
+    this.clearAllCurrentFigureMovementTimeouts();
 
     this.gameScreen.stackFigureOntoCanvas(this.currentFigure);
     this.gameScreen.clearFilledRows().then(numberOfRows => {
@@ -385,7 +400,7 @@ export class Tetris {
 
     this.changeScore({ type: 'stackFigure' });
     this.spawnNewCurrentFigure();
-    this.dropCurrentFigure();
+    this.descendCurrentFigure();
   };
 
   rotateCurrentFigure = () => {
