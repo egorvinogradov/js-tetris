@@ -41,7 +41,7 @@ function saveAppToCache(){
 
 async function handleRequest(request){
   const { hostname, pathname } = new URL(request.url);
-  const isDevelopment = hostname === 'localhost' || hostname === '127.0.0.1';
+  const isDevelopment = hostname === 'localhost' || /^[0-9.]+$/.test(hostname);
 
   let cachedEntry;
   let cacheMatch;

@@ -1,4 +1,7 @@
 :root {
+
+  --mobile-breakpoint: 420px;
+
   --position-tetris-scale: 1;
   --position-tetris-translate-top: 0;
   --position-tetris-translate-right: 0;
@@ -40,14 +43,28 @@
   --tetris-font-family-screen: 'Tetris Screen', monospace;
 
   --tetris-border-radius: 24px;
-}
 
+  --ui-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --ui-font-size-primary: 17px;
+  --ui-font-size-secondary: 13px;
+
+  --ui-prompt-external-indent: 20px;
+  --ui-prompt-internal-indent: 20px;
+
+  --ui-radius: 6px;
+  --ui-radius-icon: 100%;
+  --ui-color-text: #121212;
+  --ui-color-button-primary: #0033FF;
+  --ui-color-button-secondary: transparent;
+
+  --ui-size-prompt: 400px;
+  --ui-size-icon: 72px;
+}
 
 .device--tablet {
   --landing-logo-cube-size: 1.2vmin;
   --landing-font-size: 2.75vmin;
 }
-
 
 .device--phone {
   --landing-logo-top: 10vmin;
@@ -56,4 +73,18 @@
   --landing-font-size: 3.75vmin;
   --position-tetris-rotation: 16deg;
   --position-tetris-ongoing-game-rotation: 0deg;
+
+  --ui-size-prompt: 100%;
+  --ui-size-icon: 18vmin;
+}
+
+.device--ios {
+  --ui-color-button-primary: #007AFF;
+  --ui-color-button-secondary: white;
+  --ui-radius: 10px;
+  --ui-radius-icon: 15px;
+}
+
+.device--ios.device--phone {
+  --ui-prompt-external-indent: 0;
 }

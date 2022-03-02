@@ -49,8 +49,8 @@
 }
 
 @media all and (orientation: portrait) {
-  .device--touch.standalone .logo,
-  .device--touch.standalone .menu-mobile {
+  .device--touch.installed .logo,
+  .device--touch.installed .menu-mobile {
     margin-top: 20px;
   }
 }

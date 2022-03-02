@@ -1,4 +1,11 @@
-import { addRootClass, getCSSVariable } from './utils.js';
+import {
+  addRootClass,
+  getCSSVariable,
+  getDeviceCharacteristics,
+  getOrientation,
+  waitUntilEventFired,
+  removeRootClass,
+} from './utils.js';
 
 export class PWA {
 
@@ -7,7 +14,30 @@ export class PWA {
   PROMPT_DISMISSAL_MAX_ATTEMPTS = 3;
   PROMPT_DISMISSAL_EXPIRATION_PERIOD = 5 * 24 * 60 * 60 * 100; // 5 days
 
-  beforeInstallPrompt = null;
+  PROMPT_MESSAGES = {
+    manual: {
+      title: 'Adding to Home Screen',
+      caption: 'Brick Game will be added to your home screen. You will be able to play offline and track your scores.',
+      button: 'Continue',
+    },
+    automatic: {
+      title: 'Add to Home Screen?',
+      caption: 'You will be able to play offline and track your scores.',
+      button: 'Yes, Add to Home Screen',
+    },
+  };
+
+  CLASSNAME_PROMPT_ENABLED = 'installation-enabled';
+  CLASSNAME_PROMPT_SHOWN = 'installation-shown';
+
+  PROMPT_ANIMATION_DURATION = 400;
+
+  /**
+   * @type {?'manual'|'automatic'}
+   */
+  promptTypeShown = null;
+  chromiumBeforeInstallPrompt = null;
+  device = getDeviceCharacteristics();
 
   constructor(){
     if (localStorage['debug']) {
@@ -18,82 +48,163 @@ export class PWA {
       this.registerServiceWorker();
     }
 
-    this.detectStandalone();
-    this.renderIOSSplashScreen();
+    this.getInstallationStatus().then(status => {
+      const { isInstalled, canInstall, chromiumBeforeInstallPrompt } = status;
 
-    window.addEventListener('beforeinstallprompt', this.onReadyToInstall);
-    window.addEventListener('appinstalled', this.dismissPromptForever);
+      if (isInstalled) {
+        addRootClass('installed');
+        if (this.device.isIOS) {
+          this.renderIOSSplashScreen();
+        }
+        this.dismissPromptForever();
+      }
+      if (canInstall) {
+        addRootClass('can-install');
+        if (chromiumBeforeInstallPrompt) {
+          chromiumBeforeInstallPrompt.preventDefault();
+          this.chromiumBeforeInstallPrompt = chromiumBeforeInstallPrompt;
+        }
+        this.initializePromptUI();
 
-    document.querySelector('.pwa-install-button').addEventListener('click', () => {
-      // TODO: show PWA installation popup
+        // TODO: installation cancelled workflow
+
+        window.addEventListener('appinstalled', () => {
+          this.dismissPromptForever();
+          addRootClass('installed');
+          removeRootClass('can-install');
+        });
+      }
     });
   }
 
-  onReadyToInstall = (beforeInstallPrompt) => {
-    beforeInstallPrompt.preventDefault();
-    this.beforeInstallPrompt = beforeInstallPrompt;
-
-    // TODO: rewrite logic according to new design
-    // this.promptElement = document.querySelector('.installation');
-    // this.buttonYesElement = document.querySelector('.installation-options-item--yes');
-    // this.buttonNoElement = document.querySelector('.installation-options-item--no');
-    // this.buttonNeverElement = document.querySelector('.installation-options-item--never');
-
-    if (this.canShowInstallationPrompt()) {
-      // this.promptElement.hidden = false; // TODO: redesign appearance
-      // this.buttonYesElement.addEventListener('click', this.install);
-      // this.buttonNoElement.addEventListener('click', this.dismissPromptOnce);
-
-      if (this.getPromptDismissalAttempts() > 0) {
-        // this.buttonNeverElement.hidden = false;
-        // this.buttonNeverElement.addEventListener('click', this.dismissPromptForever);
-      }
+  getInstallationStatus = () => {
+    if (this.device.isIOS) {
+      const isInstalled = Boolean(navigator['standalone']); // iOS;
+      return new Promise(resolve => resolve({
+        chromiumBeforeInstallPrompt: null,
+        canInstall: !isInstalled,
+        isInstalled,
+      }));
     }
+    else {
+      let isInstalled = false;
+      try {
+        isInstalled = Boolean(window.matchMedia('(display-mode: standalone)').matches); // Chrome
+      }
+      catch (e) {}
+      return new Promise(resolve => {
+        waitUntilEventFired(window, 'beforeinstallprompt', 2000).then(chromiumBeforeInstallPrompt => {
+          resolve({
+            chromiumBeforeInstallPrompt,
+            canInstall: Boolean(chromiumBeforeInstallPrompt) && !isInstalled,
+            isInstalled,
+          })
+        });
+      });
+    }
+  };
+
+  initializePromptUI = () => {
+    document.querySelector('.install-call-to-action').addEventListener('click', () => {
+      this.showPrompt('manual');
+    });
+    document.querySelector('.install-button--continue').addEventListener('click', this.install);
+    document.querySelector('.install-button--never-ask').addEventListener('click', this.dismissPromptForever);
+    document.querySelectorAll('.install-button--cancel, .install-prompt-close, .install-backdrop').forEach(element => {
+      element.addEventListener('click', this.dismissPromptOnce);
+    });
   };
 
   getPromptDismissalAttempts = () => {
     return +localStorage['prompt_dismissal_attempts'] || 0;
   };
 
+  showPrompt = (type) => {
+    const messages = this.PROMPT_MESSAGES[type];
+    document.querySelector('.install-prompt-title').innerHTML = messages.title;
+    document.querySelector('.install-prompt-title-caption').innerHTML = messages.caption;
+    document.querySelector('.install-button--continue').innerHTML = messages.button;
+
+    this.toggleNeverAskButtonVisibility(type);
+    this.promptTypeShown = type;
+
+    addRootClass(this.CLASSNAME_PROMPT_ENABLED);
+    requestAnimationFrame(() => {
+      addRootClass(this.CLASSNAME_PROMPT_SHOWN);
+    });
+  };
+
+  hidePrompt = () => {
+    this.promptTypeShown = null;
+
+    removeRootClass(this.CLASSNAME_PROMPT_SHOWN);
+    setTimeout(() => {
+      removeRootClass(this.CLASSNAME_PROMPT_ENABLED);
+    }, this.PROMPT_ANIMATION_DURATION);
+  };
+
+  toggleNeverAskButtonVisibility = (promptType) => {
+    const isHidden = promptType === 'manual' || this.getPromptDismissalAttempts() === 0;
+    document.querySelector('.install-button--never-ask').hidden = isHidden;
+  };
+
   dismissPromptOnce = () => {
-    localStorage['prompt_dismissal_attempts'] = this.getPromptDismissalAttempts() + 1;
-    localStorage['prompt_dismissal_date'] = +new Date();
-    // this.promptElement.hidden = true; // TODO: rewrite logic according to new design
+    if (this.promptTypeShown === 'automatic') {
+      localStorage['prompt_dismissal_attempts'] = this.getPromptDismissalAttempts() + 1;
+      localStorage['prompt_dismissal_date'] = +new Date();
+    }
+    this.hidePrompt();
   };
 
   dismissPromptForever = () => {
-    localStorage['prompt_dismissal_attempts'] = this.PROMPT_DISMISSAL_MAX_ATTEMPTS;
-    // this.promptElement.hidden = true; // TODO: rewrite logic according to new design
+    if (this.promptTypeShown === 'automatic') {
+      localStorage['prompt_dismissal_attempts'] = this.PROMPT_DISMISSAL_MAX_ATTEMPTS;
+    }
+    this.hidePrompt();
   };
 
-  canShowInstallationPrompt = () => {
-    // TODO: show after first play (and after some time has passed)
-
-    if (this.getPromptDismissalAttempts() >= this.PROMPT_DISMISSAL_MAX_ATTEMPTS) {
-      return false;
-    }
+  remindAboutInstallation = () => {
     const promptDismissalTimestamp = +new Date(+localStorage['prompt_dismissal_date']) || 0;
     const currentTimestamp = +new Date() || 0;
-    return promptDismissalTimestamp + this.PROMPT_DISMISSAL_EXPIRATION_PERIOD < currentTimestamp;
+
+    const remindedRecently = promptDismissalTimestamp + this.PROMPT_DISMISSAL_EXPIRATION_PERIOD > currentTimestamp;
+    const remindedTooManyTimes = this.getPromptDismissalAttempts() >= this.PROMPT_DISMISSAL_MAX_ATTEMPTS;
+
+    if (!remindedTooManyTimes && !remindedRecently) {
+      this.showPrompt('automatic');
+    }
   };
 
   install = () => {
-    if (this.beforeInstallPrompt) {
-      this.beforeInstallPrompt.prompt();
-      this.beforeInstallPrompt.userChoice.then(result => {
+    if (this.chromiumBeforeInstallPrompt) {
+      this.chromiumBeforeInstallPrompt.prompt();
+      this.chromiumBeforeInstallPrompt.userChoice.then(result => {
         if (result.outcome === 'accepted') {
           delete localStorage['prompt_dismissal_attempts'];
           delete localStorage['prompt_dismissal_date'];
-          // this.promptElement.hidden = true; // TODO: rewrite logic according to new design
+          this.hidePrompt();
         }
-        this.beforeInstallPrompt = null;
+        this.chromiumBeforeInstallPrompt = null;
       });
     }
+    else {
+      this.showIOSInstallationInstructions();
+    }
+  };
+
+  showIOSInstallationInstructions = () => {
+    alert('IOS INSTALLATION');
   };
 
   registerServiceWorker = () => {
     return new Promise((resolve, reject) => {
       try {
+        // noinspection JSCheckFunctionSignatures
+        /**
+         * This syntax - [(new URL(...), import.meta.url), { type: 'module' }]
+         * is required by Parcel bundler
+         * @see https://parceljs.org/languages/javascript/#service-workers
+         */
         navigator.serviceWorker.register(new URL('../service_worker.js', import.meta.url), { type: 'module', scope: '/' })
           .then(resolve)
           .catch(reject);
@@ -154,18 +265,6 @@ export class PWA {
         }
         catch (e) {}
       });
-    }
-  };
-
-  detectStandalone = () => {
-    const isStandaloneIOS = Boolean(navigator.standalone);
-    let isStandaloneChrome = false;
-    try {
-      isStandaloneChrome = Boolean(window.matchMedia('(display-mode: standalone)').matches); // Chrome
-    }
-    catch (e) {}
-    if (isStandaloneIOS || isStandaloneChrome) {
-      addRootClass('standalone');
     }
   };
 

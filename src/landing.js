@@ -11,6 +11,7 @@ import {
   getViewport,
   random,
   vminToPx,
+  waitUntilEventFired,
 } from './utils.js';
 
 
@@ -106,7 +107,7 @@ export class BrickGameLanding {
   }
 
   redirectToHttps = () => {
-    const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const isDevelopment = location.hostname === 'localhost' || /^[0-9.]+$/.test(location.hostname);
     if (!isDevelopment && location.protocol === 'http:') {
       location.protocol = 'https:';
     }
@@ -118,10 +119,14 @@ export class BrickGameLanding {
 
     if (isTouchDevice) {
       if (screen.orientation) {
-        screen.orientation.lock('portrait');
+        screen.orientation.lock('portrait').catch(() => {});
       }
       window.addEventListener('orientationchange', () => {
-        this.waitOrientationChangeEnd().then(() => {
+        waitUntilEventFired(window, 'resize', 400).then(() => {
+          /**
+           * Waiting until viewport dimensions change after changeorientation event occurred
+           * @see https://stackoverflow.com/questions/12452349/mobile-viewport-height-after-orientation-change
+           */
           this.repositionLandingContent();
           this.repositionLandingContentForOngoingGame();
         });
@@ -141,25 +146,6 @@ export class BrickGameLanding {
         this.repositionLandingContentForOngoingGame();
       });
     }
-  };
-
-  waitOrientationChangeEnd = () => {
-    /**
-     * Waiting until viewport dimensions change after changeorientation event occurred
-     * @see https://stackoverflow.com/questions/12452349/mobile-viewport-height-after-orientation-change
-     */
-    return new Promise(resolve => {
-      const maxOrientationChangeDelay = 400;
-      let orientationChangeDelayTimeout = null;
-
-      const onOrientationChangeEnded = () => {
-        clearTimeout(orientationChangeDelayTimeout);
-        window.removeEventListener('resize', onOrientationChangeEnded);
-        resolve();
-      };
-      orientationChangeDelayTimeout = setTimeout(onOrientationChangeEnded, maxOrientationChangeDelay);
-      window.addEventListener('resize', onOrientationChangeEnded);
-    });
   };
 
   preventPinchZoomInIOS = () => {
@@ -209,6 +195,9 @@ export class BrickGameLanding {
     this.tetris.on(TETRIS_EVENTS.GAME_OVER, notification => {
       const { title, body } = notification;
       this.pwa.showNotification(title, body);
+
+      // TODO: fix order
+      this.pwa.remindAboutInstallation();
       addRootClass(this.CLASSNAME_GAME_OVER);
     });
     this.tetris.on(TETRIS_EVENTS.QUIT, this.resetTetrisClassnames);
@@ -219,6 +208,8 @@ export class BrickGameLanding {
     // TODO: rewrite logic according to new design
     // document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
 
+    // TODO: fix order
+    this.pwa.remindAboutInstallation();
     addRootClass(this.CLASSNAME_INITIALIZED);
   };
 

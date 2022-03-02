@@ -44,12 +44,12 @@ export function setCSSVariable(key, value, postfix) {
   document.documentElement.style.setProperty(key, (value || 0) + (postfix || ''));
 }
 
-export function addRootClass(className) {
-  document.documentElement.classList.add(className);
+export function addRootClass(...className) {
+  document.documentElement.classList.add(...className);
 }
 
-export function removeRootClass(className) {
-  document.documentElement.classList.remove(className);
+export function removeRootClass(...className) {
+  document.documentElement.classList.remove(...className);
 }
 
 export function capitalize(str) {
@@ -122,7 +122,7 @@ export function getDeviceCharacteristics(){
   let deviceType = 'desktop';
   if (isTouchDevice) {
     const screenWidth = Math.min(screen.availWidth, screen.availHeight);
-    if (screenWidth < 420) {
+    if (screenWidth < getCSSVariable('--mobile-breakpoint', true)) {
       deviceType = 'phone';
     }
     else {
@@ -199,4 +199,17 @@ export function timestampToHumanReadableDuration(timestamp) {
 
 export function inflectByNumber(number, word){
   return `${number} ${word}${number === 1 ? '' : 's'}`;
+}
+
+export function waitUntilEventFired(element, eventType, maxDelay) {
+  return new Promise(resolve => {
+    let timeout = null;
+    const callback = (...args) => {
+      clearTimeout(timeout);
+      element.removeEventListener(eventType, callback);
+      resolve(...args);
+    };
+    timeout = setTimeout(callback, maxDelay);
+    element.addEventListener(eventType, callback);
+  });
 }
