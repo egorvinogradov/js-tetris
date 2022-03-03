@@ -3,20 +3,20 @@ import { Figure } from './figure.js';
 import { Sound } from './sound.js';
 import { DemoScene } from './demoscene.js';
 import {
+  events,
+  TETRIS_NEW_GAME,
+  TETRIS_PLAY_PAUSE,
+  TETRIS_GAME_OVER,
+  TETRIS_QUIT,
+} from './events.js';
+
+import {
   formatNumber,
   inflectByNumber,
   getDeviceCharacteristics,
   numberToHumanReadableOrder,
   timestampToHumanReadableDuration,
 } from './utils.js';
-
-
-export const TETRIS_EVENTS = {
-  NEW_GAME: 'NEW_GAME',
-  PLAY_PAUSE: 'PLAY_PAUSE',
-  QUIT: 'QUIT',
-  GAME_OVER: 'GAME_OVER',
-};
 
 
 export class Tetris {
@@ -39,7 +39,6 @@ export class Tetris {
   rowsCleared = 0;
   currentGameStartedAt = null;
 
-  events = {};
   descendInterval = null;
   figureMovements = {};
   isMovementKeyDown = {};
@@ -93,19 +92,6 @@ export class Tetris {
     this.enableMovementKeys();
   }
 
-  on = (eventName, callback) => {
-    if (!this.events[eventName]) {
-      this.events[eventName] = [];
-    }
-    this.events[eventName].push(callback);
-  };
-
-  triggerEvent = (eventName, data) => {
-    if (this.events[eventName]?.length) {
-      this.events[eventName].map(callback => callback(data));
-    }
-  };
-
   isPlaying = () => {
     return this.isOngoingGame && !this.isPaused;
   };
@@ -126,14 +112,14 @@ export class Tetris {
 
       this.spawnNewCurrentFigure();
       this.descendCurrentFigure();
-      this.triggerEvent(TETRIS_EVENTS.NEW_GAME);
+      events.trigger(TETRIS_NEW_GAME);
     }
   };
 
   pauseOrResumeGame = () => {
     if (this.isOngoingGame) {
       this.isPaused = !this.isPaused;
-      this.triggerEvent(TETRIS_EVENTS.PLAY_PAUSE, this.isPaused);
+      events.trigger(TETRIS_PLAY_PAUSE, this.isPaused);
     }
   };
 
@@ -149,7 +135,7 @@ export class Tetris {
       this.changeScore({ type: 'reset' });
       this.gameScreen.reset();
       this.demoScene.launchScreenSaver();
-      this.triggerEvent(TETRIS_EVENTS.QUIT);
+      events.trigger(TETRIS_QUIT);
     }
   };
 
@@ -355,9 +341,9 @@ export class Tetris {
   };
 
   getDescendSpeed = () => {
-    const { deviceType } = getDeviceCharacteristics();
+    const { screenType } = getDeviceCharacteristics();
     const speed = this.SPEED_DESCEND - ((this.level - 1) * this.SPEED_DESCEND_REDUCTION_BY_LEVEL);
-    const speedLimit = deviceType === 'desktop'
+    const speedLimit = screenType === 'desktop'
       ? this.SPEED_LIMIT_DESKTOP
       : this.SPEED_LIMIT_MOBILE;
     return Math.max(speed, speedLimit);
@@ -449,7 +435,7 @@ export class Tetris {
     };
     this.saveScoreToHistory(results, this.currentGameStartedAt).then(item => {
       const notification = this.generateGameOverNotification(item);
-      this.triggerEvent(TETRIS_EVENTS.GAME_OVER, notification);
+      events.trigger(TETRIS_GAME_OVER, notification);
     });
 
     this.sound.gameOver();
@@ -457,7 +443,7 @@ export class Tetris {
 
     this.demoScene.showGameOverScreen().then(() => {
       this.changeScore({ type: 'reset' });
-      this.triggerEvent(TETRIS_EVENTS.QUIT);
+      events.trigger(TETRIS_QUIT);
       this.demoScene.launchScreenSaver();
     });
   };

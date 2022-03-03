@@ -61,12 +61,12 @@
   --ui-size-icon: 72px;
 }
 
-.device--tablet {
+.screen--tablet {
   --landing-logo-cube-size: 1.2vmin;
   --landing-font-size: 2.75vmin;
 }
 
-.device--phone {
+.screen--phone {
   --landing-logo-top: 10vmin;
   --landing-logo-left: 10vmin;
   --landing-logo-cube-size: 1.5vmin;
@@ -78,13 +78,13 @@
   --ui-size-icon: 18vmin;
 }
 
-.device--ios {
+.os--ios {
   --ui-color-button-primary: #007AFF;
   --ui-color-button-secondary: white;
   --ui-radius: 10px;
   --ui-radius-icon: 15px;
 }
 
-.device--ios.device--phone {
+.os--ios.screen--phone {
   --ui-prompt-external-indent: 0;
 }

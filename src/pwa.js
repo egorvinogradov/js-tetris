@@ -1,10 +1,10 @@
+import { events, PWA_READY_TO_INSTALL } from './events.js';
 import {
   addRootClass,
   getCSSVariable,
   getDeviceCharacteristics,
-  getOrientation,
   waitUntilEventFired,
-  removeRootClass,
+  removeRootClass, template,
 } from './utils.js';
 
 export class PWA {
@@ -16,14 +16,14 @@ export class PWA {
 
   PROMPT_MESSAGES = {
     manual: {
-      title: 'Adding to Home Screen',
-      caption: 'Brick Game will be added to your home screen. You will be able to play offline and track your scores.',
+      title: 'Adding to {destination}',
+      caption: 'Brick Game will be added to your {destination}. You will be able to play offline and track your scores.',
       button: 'Continue',
     },
     automatic: {
-      title: 'Add to Home Screen?',
+      title: 'Add to {destination}?',
       caption: 'You will be able to play offline and track your scores.',
-      button: 'Yes, Add to Home Screen',
+      button: 'Yes, Add to {destination}',
     },
   };
 
@@ -36,7 +36,22 @@ export class PWA {
    * @type {?'manual'|'automatic'}
    */
   promptTypeShown = null;
-  chromiumBeforeInstallPrompt = null;
+
+  /**
+   * @type {{
+        isInstalled: boolean,
+        canInstall: boolean,
+        installationType: ?'iOSManualAddToHomeScreen'|'androidBeforeInstallPrompt'|'desktopBeforeInstallPrompt'
+        beforeInstallPrompt: Event|null
+      }}
+   */
+  installationStatus = {
+    isInstalled: false,
+    canInstall: false,
+    installationType: null,
+    beforeInstallPrompt: null,
+  };
+
   device = getDeviceCharacteristics();
 
   constructor(){
@@ -49,41 +64,40 @@ export class PWA {
     }
 
     this.getInstallationStatus().then(status => {
-      const { isInstalled, canInstall, chromiumBeforeInstallPrompt } = status;
+      this.installationStatus = status;
+      const {
+        isInstalled,
+        canInstall,
+        installationType,
+        beforeInstallPrompt,
+      } = this.installationStatus;
 
       if (isInstalled) {
         addRootClass('installed');
-        if (this.device.isIOS) {
+        this.dismissPromptForever();
+        if (installationType === 'iOSManualAddToHomeScreen') {
           this.renderIOSSplashScreen();
         }
-        this.dismissPromptForever();
       }
       if (canInstall) {
         addRootClass('can-install');
-        if (chromiumBeforeInstallPrompt) {
-          chromiumBeforeInstallPrompt.preventDefault();
-          this.chromiumBeforeInstallPrompt = chromiumBeforeInstallPrompt;
-        }
-        this.initializePromptUI();
-
-        // TODO: installation cancelled workflow
-
-        window.addEventListener('appinstalled', () => {
-          this.dismissPromptForever();
-          addRootClass('installed');
-          removeRootClass('can-install');
-        });
+        this.initializePromptButtons();
+        this.initializeBeforeInstallPrompt(beforeInstallPrompt);
       }
+      events.trigger(PWA_READY_TO_INSTALL);
     });
   }
 
   getInstallationStatus = () => {
-    if (this.device.isIOS) {
+    const { os } = this.device;
+
+    if (os === 'ios') {
       const isInstalled = Boolean(navigator['standalone']); // iOS;
       return new Promise(resolve => resolve({
-        chromiumBeforeInstallPrompt: null,
-        canInstall: !isInstalled,
         isInstalled,
+        canInstall: !isInstalled,
+        installationType: 'iOSManualAddToHomeScreen',
+        beforeInstallPrompt: null,
       }));
     }
     else {
@@ -92,21 +106,28 @@ export class PWA {
         isInstalled = Boolean(window.matchMedia('(display-mode: standalone)').matches); // Chrome
       }
       catch (e) {}
+
       return new Promise(resolve => {
-        waitUntilEventFired(window, 'beforeinstallprompt', 2000).then(chromiumBeforeInstallPrompt => {
+        waitUntilEventFired(window, 'beforeinstallprompt', 2000).then(beforeInstallPrompt => {
           resolve({
-            chromiumBeforeInstallPrompt,
-            canInstall: Boolean(chromiumBeforeInstallPrompt) && !isInstalled,
             isInstalled,
+            canInstall: Boolean(beforeInstallPrompt) && !isInstalled,
+            installationType: 'beforeInstallPrompt',
+            beforeInstallPrompt,
           })
         });
       });
     }
   };
 
-  initializePromptUI = () => {
+  initializePromptButtons = () => {
     document.querySelector('.install-call-to-action').addEventListener('click', () => {
-      this.showPrompt('manual');
+      if (this.device.screenType === 'desktop') {
+        this.install();
+      }
+      else {
+        this.showPrompt('manual');
+      }
     });
     document.querySelector('.install-button--continue').addEventListener('click', this.install);
     document.querySelector('.install-button--never-ask').addEventListener('click', this.dismissPromptForever);
@@ -115,15 +136,42 @@ export class PWA {
     });
   };
 
+  initializeBeforeInstallPrompt = (beforeInstallPrompt) => {
+    if (beforeInstallPrompt) {
+      beforeInstallPrompt.preventDefault();
+      beforeInstallPrompt.userChoice.then(result => {
+        this.installationStatus.canInstall = false;
+        this.installationStatus.beforeInstallPrompt = null;
+        removeRootClass('can-install');
+
+        if (result.outcome === 'accepted') {
+          this.installationStatus.isInstalled = true;
+          addRootClass('installed');
+
+          this.hidePrompt();
+          delete localStorage['prompt_dismissal_attempts'];
+          delete localStorage['prompt_dismissal_date'];
+        }
+      });
+    }
+  };
+
   getPromptDismissalAttempts = () => {
     return +localStorage['prompt_dismissal_attempts'] || 0;
   };
 
   showPrompt = (type) => {
-    const messages = this.PROMPT_MESSAGES[type];
-    document.querySelector('.install-prompt-title').innerHTML = messages.title;
-    document.querySelector('.install-prompt-title-caption').innerHTML = messages.caption;
-    document.querySelector('.install-button--continue').innerHTML = messages.button;
+    const { screenType } = this.device;
+    const templates = this.PROMPT_MESSAGES[type];
+    const destination = screenType === 'desktop' ? 'Desktop' : 'Home Screen';
+
+    const title = template(templates.title, { destination });
+    const caption = template(templates.caption, { destination: destination.toLowerCase() });
+    const button = template(templates.button, { destination });
+
+    document.querySelector('.install-prompt-title').innerHTML = title;
+    document.querySelector('.install-prompt-title-caption').innerHTML = caption;
+    document.querySelector('.install-button--continue').innerHTML = button;
 
     this.toggleNeverAskButtonVisibility(type);
     this.promptTypeShown = type;
@@ -164,31 +212,28 @@ export class PWA {
   };
 
   remindAboutInstallation = () => {
-    const promptDismissalTimestamp = +new Date(+localStorage['prompt_dismissal_date']) || 0;
+    const { canInstall } = this.installationStatus;
+
+    const lastPromptDismissalTimestamp = +new Date(+localStorage['prompt_dismissal_date']) || 0;
     const currentTimestamp = +new Date() || 0;
 
-    const remindedRecently = promptDismissalTimestamp + this.PROMPT_DISMISSAL_EXPIRATION_PERIOD > currentTimestamp;
+    const remindedRecently = lastPromptDismissalTimestamp + this.PROMPT_DISMISSAL_EXPIRATION_PERIOD > currentTimestamp;
     const remindedTooManyTimes = this.getPromptDismissalAttempts() >= this.PROMPT_DISMISSAL_MAX_ATTEMPTS;
 
-    if (!remindedTooManyTimes && !remindedRecently) {
+    if (canInstall && !remindedTooManyTimes && !remindedRecently) {
       this.showPrompt('automatic');
     }
   };
 
   install = () => {
-    if (this.chromiumBeforeInstallPrompt) {
-      this.chromiumBeforeInstallPrompt.prompt();
-      this.chromiumBeforeInstallPrompt.userChoice.then(result => {
-        if (result.outcome === 'accepted') {
-          delete localStorage['prompt_dismissal_attempts'];
-          delete localStorage['prompt_dismissal_date'];
-          this.hidePrompt();
-        }
-        this.chromiumBeforeInstallPrompt = null;
-      });
-    }
-    else {
-      this.showIOSInstallationInstructions();
+    const { canInstall, installationType, beforeInstallPrompt } = this.installationStatus;
+    if (canInstall) {
+      if (installationType === 'iOSManualAddToHomeScreen') {
+        this.showIOSInstallationInstructions();
+      }
+      else if (beforeInstallPrompt) {
+        beforeInstallPrompt.prompt();
+      }
     }
   };
 
@@ -243,13 +288,14 @@ export class PWA {
   };
 
   reset = () => {
+    const excludedLocalStorageKeys = ['debug', 'history'];
     if (window.caches) {
       window.caches.keys().then(keys => {
         keys.forEach(key => caches.delete(key));
       });
     }
     for (let key in localStorage) {
-      if (key !== 'debug' && key !== 'history') {
+      if (!excludedLocalStorageKeys.includes(key)) {
         localStorage.removeItem(key);
       }
     }

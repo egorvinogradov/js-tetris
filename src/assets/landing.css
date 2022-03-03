@@ -314,7 +314,7 @@ a:hover {
   transition: opacity 200ms ease-in-out;
 }
 
-.device--ios .install-backdrop {
+.os--ios .install-backdrop {
   background: rgba(0,0,0,.25);
 }
 
@@ -335,7 +335,7 @@ a:hover {
   transition: opacity 400ms ease-in-out, transform 300ms ease-in-out;
 }
 
-.device--phone .install-prompt {
+.screen--phone .install-prompt {
   top: auto;
   left: var(--ui-prompt-external-indent);
   right: var(--ui-prompt-external-indent);
@@ -343,19 +343,19 @@ a:hover {
   transform: translateY(30%);
 }
 
-.device--ios .install-prompt {
+.os--ios .install-prompt {
   box-shadow: none;
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(10px) contrast(0.7) brightness(1.5);
 }
 
-.device--ios.device--phone .install-prompt {
+.os--ios.screen--phone .install-prompt {
   transform: translateY(100%); /* needed for slide-up effect */
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.device--ios.device--tablet .install-prompt {
+.os--ios.screen--tablet .install-prompt {
   top: var(--ui-prompt-external-indent);
   right: var(--ui-prompt-external-indent);
   left: auto;
@@ -387,7 +387,7 @@ a:hover {
   color: #808185;
 }
 
-.device--ios .install-prompt-close {
+.os--ios .install-prompt-close {
   display: block;
 }
 
@@ -466,7 +466,7 @@ a:hover {
   color: #FF5650 !important;
 }
 
-.device--ios .install-button--cancel {
+.os--ios .install-button--cancel {
   display: none;
 }
 
@@ -520,16 +520,16 @@ a:hover {
   opacity: 1;
 }
 
-.installation-shown.device--phone .install-prompt {
+.installation-shown.screen--phone .install-prompt {
   transform: none;
 }
 
 @media all and (orientation: landscape) {
-  .device--phone .install-call-to-action {
+  .screen--phone .install-call-to-action {
     opacity: 0;
     pointer-events: none;
   }
-  .device--phone.installation-enabled .install {
+  .screen--phone.installation-enabled .install {
     display: none;
   }
 }

@@ -1,5 +1,14 @@
-import { Tetris, TETRIS_EVENTS } from './tetris.js';
+import { Tetris } from './tetris.js';
 import { PWA } from './pwa.js';
+import {
+  events,
+  TETRIS_NEW_GAME,
+  TETRIS_PLAY_PAUSE,
+  TETRIS_GAME_OVER,
+  TETRIS_QUIT,
+  PWA_READY_TO_INSTALL,
+} from './events.js';
+
 import {
   addRootClass,
   removeRootClass,
@@ -114,8 +123,9 @@ export class BrickGameLanding {
   };
 
   applyDeviceBasedLogic = () => {
-    const { deviceType, isTouchDevice, isIOS } = this.device;
-    addRootClass('device--' + deviceType);
+    const { screenType, isTouchDevice, os } = this.device;
+    addRootClass('screen--' + screenType);
+    addRootClass('os--' + os);
 
     if (isTouchDevice) {
       if (screen.orientation) {
@@ -134,10 +144,9 @@ export class BrickGameLanding {
       addRootClass('device--touch');
     }
 
-    if (isIOS) {
+    if (os === 'ios') {
       this.preventPinchZoomInIOS();
       this.preventDoubleTabZoomInIOS();
-      addRootClass('device--ios');
     }
 
     if (!isTouchDevice) {
@@ -185,32 +194,39 @@ export class BrickGameLanding {
       gameScreenContainer: document.querySelector(this.GAME_SCREEN_SELECTOR),
       nextFigureScreenContainer: document.querySelector(this.NEXT_FIGURE_SCREEN_SELECTOR),
     });
-    this.tetris.on(TETRIS_EVENTS.NEW_GAME, () => {
+
+    events.on(TETRIS_NEW_GAME, () => {
       this.resetTetrisClassnames();
       addRootClass(this.CLASSNAME_ONGOING_GAME);
     });
-    this.tetris.on(TETRIS_EVENTS.PLAY_PAUSE, isPaused => {
+
+    events.on(TETRIS_PLAY_PAUSE, isPaused => {
       isPaused ? addRootClass(this.CLASSNAME_PAUSED) : removeRootClass(this.CLASSNAME_PAUSED);
     });
-    this.tetris.on(TETRIS_EVENTS.GAME_OVER, notification => {
+
+    events.on(TETRIS_GAME_OVER, notification => {
       const { title, body } = notification;
       this.pwa.showNotification(title, body);
-
-      // TODO: fix order
-      this.pwa.remindAboutInstallation();
       addRootClass(this.CLASSNAME_GAME_OVER);
     });
-    this.tetris.on(TETRIS_EVENTS.QUIT, this.resetTetrisClassnames);
+
+    events.on(TETRIS_QUIT, () => {
+      this.pwa.remindAboutInstallation();
+      this.resetTetrisClassnames();
+    });
+
+    events.on(PWA_READY_TO_INSTALL, () => {
+      if ( this.tetris.getScoreHistory().items.length ) {
+        this.pwa.remindAboutInstallation();
+      }
+    });
 
     document.querySelector('.menu-desktop-play').addEventListener('click', this.tetris.launchNewGame);
     document.querySelector('.menu-mobile-play').addEventListener('click', this.tetris.launchNewGame);
+    addRootClass(this.CLASSNAME_INITIALIZED);
 
     // TODO: rewrite logic according to new design
     // document.querySelector('.options-paused').addEventListener('click', this.tetris.pauseOrResumeGame);
-
-    // TODO: fix order
-    this.pwa.remindAboutInstallation();
-    addRootClass(this.CLASSNAME_INITIALIZED);
   };
 
   resetTetrisClassnames = () => {
@@ -220,14 +236,14 @@ export class BrickGameLanding {
   };
 
   repositionLandingContent = () => {
-    const { deviceType } = getDeviceCharacteristics();
+    const { screenType } = getDeviceCharacteristics();
     const orientation = getOrientation();
     const viewport = getViewport();
-    const config = this.CONTENT_POSITIONS_CONFIG[deviceType][orientation];
+    const config = this.CONTENT_POSITIONS_CONFIG[screenType][orientation];
 
     let tetrisDimensions = this.scaleTetrisToFit({ vh: config.landscapeTetrisHeight });
     if (orientation === 'portrait') {
-      tetrisDimensions = deviceType === 'phone'
+      tetrisDimensions = screenType === 'phone'
         ? this.scaleTetrisToFit({ vw: config.portraitTetrisWidth })
         : this.scaleTetrisToFit({ vh: config.portraitTetrisHeight });
     }

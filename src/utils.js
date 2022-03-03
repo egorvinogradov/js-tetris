@@ -117,22 +117,40 @@ export function supportsTouchScreen() {
 export function getDeviceCharacteristics(){
   const isIOS = /iPhone|iPod|iPad/i.test(navigator.userAgent);
   const isLateIPadOS = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 2;
-  const isTouchDevice = supportsTouchScreen();
 
-  let deviceType = 'desktop';
+  let os = null;
+  if (isIOS || isLateIPadOS) {
+    os = 'ios';
+  }
+  else if (/mac/i.test(navigator.userAgent) && !isLateIPadOS) {
+    os = 'mac';
+  }
+  else if (/android/i.test(navigator.userAgent)) {
+    os = 'android';
+  }
+  else if (/windows/i.test(navigator.userAgent)) {
+    os = 'windows';
+  }
+  else if (/linux/i.test(navigator.userAgent)) {
+    os = 'linux';
+  }
+
+  const isTouchDevice = supportsTouchScreen();
+  let screenType = 'desktop';
+
   if (isTouchDevice) {
     const screenWidth = Math.min(screen.availWidth, screen.availHeight);
     if (screenWidth < getCSSVariable('--mobile-breakpoint', true)) {
-      deviceType = 'phone';
+      screenType = 'phone';
     }
     else {
-      deviceType = 'tablet';
+      screenType = 'tablet';
     }
   }
   return {
-    deviceType,
+    screenType,
     isTouchDevice,
-    isIOS: isIOS || isLateIPadOS,
+    os,
   };
 }
 
@@ -212,4 +230,16 @@ export function waitUntilEventFired(element, eventType, maxDelay) {
     timeout = setTimeout(callback, maxDelay);
     element.addEventListener(eventType, callback);
   });
+}
+
+export function template(str, data) {
+  let result = str;
+  const matches = str.match(/{\s*([a-z0-9_]+)\s*}/ig);
+  if (matches && matches.length) {
+    matches.forEach(substr => {
+      const key = substr.replace(/[{}\s]/ig, '');
+      result = result.replace(substr, data[key] || '');
+    });
+  }
+  return result;
 }
