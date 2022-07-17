@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="37px" viewBox="0 0 28 37" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Arrow Sq</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
+        <g id="Mobile-Add-to-Homescreen-iOS-1" transform="translate(-205.000000, -763.000000)" stroke="#FF4A00" stroke-width="3">
+            <g id="Step-1-WIDE" transform="translate(21.000000, 602.000000)">
+                <g id="Arrow-Sq" transform="translate(186.000000, 162.000000)">
+                    <path d="M5,0.981344233 C1.49487305,14.0251465 8.99947787,19.6549522 16.4018164,30.3537369" id="Path-12"></path>
+                    <path d="M0.703998356,25.3537369 C5.06194961,26.0826321 12.0487235,27.5484449 18.9285915,30.2388372" id="Path-13" transform="translate(9.816295, 27.796287) rotate(18.000000) translate(-9.816295, -27.796287) "></path>
+                    <path d="M12.9989568,16.6426879 C13.4765964,18.9394452 14.6118927,23.9600279 20.9879397,29.4323566" id="Path-18" transform="translate(16.993448, 23.037522) rotate(18.000000) translate(-16.993448, -23.037522) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

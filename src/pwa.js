@@ -1,10 +1,11 @@
 import { events, PWA_READY_TO_INSTALL } from './events.js';
 import {
   addRootClass,
-  getCSSVariable,
-  getDeviceCharacteristics,
+  removeRootClass,
   waitUntilEventFired,
-  removeRootClass, template,
+  getDeviceCharacteristics,
+  getCSSVariable,
+  template,
 } from './utils.js';
 
 export class PWA {
@@ -41,7 +42,7 @@ export class PWA {
    * @type {{
         isInstalled: boolean,
         canInstall: boolean,
-        installationType: ?'iOSManualAddToHomeScreen'|'androidBeforeInstallPrompt'|'desktopBeforeInstallPrompt'
+        installationType: ?'iOSManualAddToHomeScreen'|'beforeInstallPrompt'
         beforeInstallPrompt: Event|null
       }}
    */
@@ -233,6 +234,7 @@ export class PWA {
       }
       else if (beforeInstallPrompt) {
         beforeInstallPrompt.prompt();
+        this.hidePrompt();
       }
     }
   };

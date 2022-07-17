@@ -478,16 +478,17 @@ a:hover {
 .install-call-to-action {
   position: fixed;
   bottom: var(--landing-font-size);
-  left: var(--landing-font-size);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1;
   border: 0;
   background: var(--landing-color-text);
   color: #000000;
   padding:
     var(--landing-font-size)
-    var(--landing-font-size)
+    calc(var(--landing-font-size) * 2)
     calc(var(--landing-font-size) * 0.8)
-    var(--landing-font-size);
+    calc(var(--landing-font-size) * 2);
   white-space: nowrap;
   word-spacing: calc(var(--landing-font-size) * -0.4);
   transition: opacity 500ms;
