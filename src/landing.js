@@ -146,7 +146,7 @@ export class BrickGameLanding {
 
     if (os === 'ios') {
       this.preventPinchZoomInIOS();
-      this.preventDoubleTabZoomInIOS();
+      this.preventDoubleTapZoomInIOS();
     }
 
     if (!isTouchDevice) {
@@ -168,7 +168,7 @@ export class BrickGameLanding {
     }, { passive: false });
   };
 
-  preventDoubleTabZoomInIOS = () => {
+  preventDoubleTapZoomInIOS = () => {
     /**
      * The most reliable way to disable double tap zoom on iOS.
      * <meta name=viewport content=user-scalable=no> and touch-action: manipulation; are not reliable.

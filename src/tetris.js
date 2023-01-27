@@ -369,8 +369,6 @@ export class Tetris {
     }
   };
 
-
-
   stackCurrentFigureOntoCanvas = () => {
     clearInterval(this.descendInterval);
     this.clearAllCurrentFigureMovementTimeouts();
