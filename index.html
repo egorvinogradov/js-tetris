@@ -25,8 +25,14 @@
   <meta name="msapplication-TileImage" content="./src/assets/icons/icon-windows-144.png">
   <meta name="msapplication-starturl" content="/">
 
-  <link rel="stylesheet" href="src/assets/landing.css">
-  <link rel="stylesheet" href="src/assets/tetris.css">
+  <style>
+    @import './src/assets/landing.css';
+    @import './src/assets/tetris.css';
+  </style>
+
+  <link rel="preload" href="./src/assets/fonts/PressStart2P-Regular.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./src/assets/fonts/PumpLight-Regular.woff" as="font" type="font/woff" crossorigin>
+
 </head>
 <body>
 
@@ -37,14 +43,17 @@
 
 
 <div class="options">
+  <!-- TODO: fix sounds & uncomment -->
+  <!--
   <button class="options-sound">
     Sound
     <i class="options-sound-icon"></i>
   </button>
+  -->
   <div class="options-paused">Paused</div>
 
-<!-- TODO: fix resetting PWA-->
-<!-- <div class="options-reset-pwa">&gt; Reset PWA</div>-->
+  <!-- TODO: fix resetting PWA-->
+  <!-- <div class="options-reset-pwa">&gt; Reset PWA</div>-->
 </div>
 
 

@@ -2,8 +2,9 @@
 @import './mobile.css';
 
 @font-face {
-  font-family: 'Press Start';
+  font-family: 'Press Start 2P';
   src: url('fonts/PressStart2P-Regular.woff') format('woff');
+  font-display: block;
 }
 
 body {
@@ -157,7 +158,7 @@ a:hover {
 }
 
 .options-paused {
-  padding-top: calc(var(--landing-font-size) * 2);
+  padding-top: calc(var(--landing-font-size) * 0.5);
   opacity: 0;
   pointer-events: none;
 }
@@ -250,7 +251,10 @@ a:hover {
 }
 
 .menu-desktop-keyboard-rotate-clockwise {
-  transform: translateX(calc(var(--landing-font-size) * -0.2)) rotate(90deg);
+  transform:
+    translateX(calc(var(--landing-font-size) * -0.3))
+    translateY(calc(var(--landing-font-size) * -0.1))
+    rotate(90deg);
   display: inline-block;
 }
 

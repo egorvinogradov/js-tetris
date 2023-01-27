@@ -6,7 +6,7 @@ export class Sound {
 
   INTRO = './src/assets/audio/intro.mp3';
   BACKGROUND = './src/assets/audio/background.mp3';
-  ROW_CLEARED = './src/assets/audio/.mp3'; // TODO: fix
+  ROW_CLEARED = './src/assets/audio/.mp3'; // TODO: record sound & update
   GAME_OVER = './src/assets/audio/game-over.mp3';
   FIGURE_ROTATED = './src/assets/audio/figure-rotated.mp3';
   FIGURE_MOVED = './src/assets/audio/figure-moved.mp3';
@@ -50,7 +50,7 @@ export class Sound {
   };
 
   startBackgroundNoise = () => {
-    return; // TODO: remove
+    return; // TODO: fix sounds & remove
 
     if (this.backgroundPlayback) {
       this.backgroundPlayback.play();
@@ -70,7 +70,7 @@ export class Sound {
   };
 
   stopBackgroundNoise = () => {
-    return; // TODO: remove
+    return; // TODO: fix sounds & remove
 
     if (this.backgroundPlayback) {
       this.backgroundPlayback.pause();
@@ -79,7 +79,7 @@ export class Sound {
   };
 
   play = (audioUrl) => {
-    return; // TODO: remove
+    return; // TODO: fix sounds & remove
 
     const audio = new Audio(audioUrl);
     if (!this.isMute && !this.isPlayingIntro) {
@@ -90,7 +90,7 @@ export class Sound {
   };
 
   intro = () => {
-    return; // TODO: remove
+    return; // TODO: fix sounds & remove
 
     const audio = this.play(this.INTRO);
 
@@ -115,7 +115,7 @@ export class Sound {
   };
 
   figureMoved = () => {
-    return; // TODO: remove
+    return; // TODO: fix sounds & remove
 
     if (this.movementPlayback) {
       this.movementPlayback.pause();

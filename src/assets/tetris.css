@@ -3,11 +3,13 @@
 @font-face {
   font-family: 'Tetris Screen';
   src: url('fonts/TetrisScreen-Custom.woff') format('woff');
+  font-display: block;
 }
 
 @font-face {
   font-family: 'Pump Light';
-  src: url('fonts/PumpDEE-Light.woff') format('woff');
+  src: url('fonts/PumpLight-Regular.woff') format('woff');
+  font-display: block;
 }
 
 
