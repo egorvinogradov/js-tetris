@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "dev": "./bin/dev.sh",
-    "build": "./bin/build.sh"
+    "build": "./bin/build.sh",
+    "deploy": "surge dist"
   },
   "repository": {
     "type": "git",
